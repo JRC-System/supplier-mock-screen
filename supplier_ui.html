@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JRC - 回答入力 & 履歴確認 (Redesign)</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* グローバルスタイル */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Navbar Styling - モダンで洗練されたデザイン */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            padding: 1rem 1.5rem;
+            border-bottom: none;
+            position: relative;
+            overflow: visible;
+            z-index: 1050;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .navbar-brand .logo-placeholder {
+            height: 45px;
+            width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #667eea;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar-brand .logo-placeholder::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+
+        .navbar-brand .logo-placeholder:hover::before {
+            left: 100%;
+        }
+
+        .navbar-brand .logo-placeholder:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .navbar-brand span {
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ヘッダー右側のユーザー情報エリア */
+        .navbar-user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* ユーザー情報表示エリア（新しい構造） */
+        .navbar .d-flex.align-items-center {
+            gap: 1rem;
+        }
+
+        .navbar .d-flex.flex-column {
+            gap: 0.25rem;
+        }
+
+        .navbar .d-flex.flex-column small {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .navbar .d-flex.flex-column span {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+        }
+
+        .navbar-company-name {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            margin: 0;
+        }
+
+        .navbar-user-details {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .navbar-user-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-status-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            padding: 0.35em 0.7em;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        .navbar-logout-btn {
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            color: #ffffff;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+        }
+
+        .navbar-logout-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            color: #ffffff;
+        }
+
+        .navbar-brand-text {
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        /* ドロップダウンメニューのスタイル */
+        #dropdownMenuLink {
+            color: rgba(255, 255, 255, 0.98) !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            text-decoration: none;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #dropdownMenuLink::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        #dropdownMenuLink:hover::before {
+            left: 100%;
+        }
+
+        #dropdownMenuLink:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%);
+            color: #ffffff !important;
+            transform: translateY(-3px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        #dropdownMenuLink:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+
+        #dropdownMenuLink::after {
+            margin-left: 0.5rem;
+            border-top-color: rgba(255, 255, 255, 0.9);
+            transition: transform 0.3s ease;
+        }
+
+        #dropdownMenuLink[aria-expanded="true"]::after {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border: none;
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            min-width: 240px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            backdrop-filter: blur(20px);
+            animation: slideDown 0.3s ease-out;
+            z-index: 1051 !important;
+            position: absolute !important;
+        }
+
+        .dropdown {
+            position: relative;
+            z-index: 1050;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 0.85rem 1.2rem;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 0.35rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
+            transform: translateX(6px);
+            color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .dropdown-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .dropdown-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .dropdown-item.active::before {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scaleY(1);
+        }
+
+        .dropdown-item.active:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            transform: translateX(6px) scale(1.02);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-divider {
+            margin: 0.5rem 0;
+            opacity: 0.2;
+        }
+
+        .dropdown-item.text-danger {
+            color: #dc3545 !important;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #dc3545 !important;
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 991px) {
+            .navbar .d-flex.flex-column {
+                display: none !important;
+            }
+            
+            #dropdownMenuLink {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand-text {
+                display: none !important;
+            }
+
+            .navbar-user-info {
+                align-items: flex-start;
+            }
+
+            .navbar-user-name {
+                font-size: 0.85rem;
+            }
+
+            .navbar-user-details {
+                gap: 0.5rem;
+            }
+
+            .navbar-logout-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+            }
+
+            #dropdownMenuLink {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .dropdown-menu {
+                min-width: 200px;
+            }
+        }
+
+        /* Card Styling */
+        .order-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 1rem;
+            border-left: 6px solid #9ca3af;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .order-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .order-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px) scale(1.01);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        /* Type: Quote Request (見積依頼) */
+        .order-card.type-quote {
+            border-left-color: #06b6d4;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
+        }
+
+        .order-card.type-quote:hover {
+            border-left-color: #0891b2;
+            box-shadow: 0 12px 40px rgba(6, 182, 212, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .order-card.type-quote .badge-type {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+        }
+
+        /* Type: Order (発注) */
+        .order-card.type-order {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+        }
+
+        .order-card.type-order:hover {
+            border-left-color: #d97706;
+            box-shadow: 0 12px 40px rgba(245, 158, 11, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .order-card.type-order .badge-type {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        /* PDF出力ボタンのスタイル */
+        .btn-pdf {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-pdf::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-pdf:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-pdf:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-pdf:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-pdf i {
+            margin-right: 0.25rem;
+        }
+
+        /* Typography */
+        .data-label {
+            font-size: 0.7rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .data-value {
+            font-size: 0.875rem;
+            /* 0.95remから0.875remに削減 */
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .text-address {
+            font-size: 0.85rem;
+            color: #495057;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px dashed #dee2e6;
+        }
+
+        .address-text {
+            font-size: 0.85rem;
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 0.4em 0.8em;
+        }
+
+        /* モード別コンテンツ表示制御 */
+        .content-mode-input {
+            display: block;
+        }
+
+        .content-mode-history {
+            display: none;
+        }
+
+        /* Inputs */
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .15);
+        }
+
+        .bg-readonly {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: #495057;
+            cursor: not-allowed;
+        }
+
+        /* フォームコントロールのスタイル改善 */
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .form-select {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        /* カード内のコントロールパネル */
+        .card {
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer */
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.08);
+            z-index: 1040;
+            backdrop-filter: blur(10px);
+        }
+
+        #sendButton {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+
+        #sendButton:hover {
+            transform: translateY(-3px) scale(1.05) !important;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5) !important;
+        }
+
+        .sticky-footer .badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        #sendButton:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5) !important;
+        }
+
+        .main-content {
+            padding-bottom: 90px;
+        }
+
+        /* History Controls Hidden by Default */
+        .history-controls {
+            display: none;
+        }
+
+        /* 表示モード: 1行モード */
+        .view-mode-single .order-card .card-detail-full {
+            display: none !important;
+        }
+
+        .view-mode-single .order-card .card-detail-single {
+            display: flex !important;
+        }
+
+        .view-mode-all .order-card .card-detail-full {
+            display: block !important;
+        }
+
+        .view-mode-all .order-card .card-detail-single {
+            display: none !important;
+        }
+
+        /* card-detail-full内のrowを正しく表示 */
+        .card-detail-full {
+            display: block;
+            width: 100%;
+        }
+
+        /* 1行モード用のスタイル */
+        .card-detail-single {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .card-detail-single .single-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .card-detail-single .single-item label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin: 0;
+            min-width: fit-content;
+        }
+
+        .card-detail-single .single-item input,
+        .card-detail-single .single-item select {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            min-width: 100px;
+        }
+
+        .card-detail-single .single-item .value-display {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #212529;
+        }
+    </style>
+</head>
+
+<body class="view-mode-single">
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-3" href="supplier_ui.html">
+                <div class="logo-placeholder">JRC</div>
+                <span class="navbar-brand-text d-none d-md-block">株式会社JRC</span>
+            </a>
+            
+            <!-- トップメニュー（ドロップダウン） -->
+            <div class="d-flex align-items-center ms-auto me-4">
+                <!-- ユーザー情報表示 -->
+                <div class="me-3 d-flex flex-column align-items-end">
+                    <small id="companyNameDisplay" class="text-light fw-bold"></small>
+                    <span id="userNameDisplay" class="text-light small"></span>
+                </div>
+                <!-- メニュードロップダウン -->
+                <div class="dropdown">
+                    <a class="dropdown-toggle" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-bars"></i>
+                        <span>メニュー</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item active" href="supplier_ui.html" id="navHome">
+                            <i class="fa-solid fa-house"></i>
+                            <span>ホーム</span>
+                        </a></li>
+                        <li><a class="dropdown-item" href="supplier-registration.html" id="navRegistration">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>仕入先登録</span>
+                        </a></li>
+                        <li><a class="dropdown-item" href="Notification_setting.html" id="navNotification">
+                            <i class="fa-solid fa-bell"></i>
+                            <span>通知先設定</span>
+                        </a></li>
+                        <li><a class="dropdown-item" href="password_reset.html" id="navPassword">
+                            <i class="fa-solid fa-key"></i>
+                            <span>パスワード再設定</span>
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout(); return false;">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>ログアウト</span>
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+            <script>
+                // ログインユーザー情報（sessionStorageから取得して表示）
+                window.addEventListener('DOMContentLoaded', function() {
+                    let loggedInUser = null;
+                    try {
+                        loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+                    } catch(e){}
+                    if(loggedInUser){
+                        if(document.getElementById('companyNameDisplay'))
+                            document.getElementById('companyNameDisplay').textContent = loggedInUser.company_name || '';
+                        if(document.getElementById('userNameDisplay'))
+                            document.getElementById('userNameDisplay').textContent = (loggedInUser.user_name || '') + ' 様';
+                    }
+                });
+            </script>
+
+            <!-- <div class="navbar-user-info">
+                <small class="navbar-company-name" id="companyNameDisplay">株式会社テスト</small>
+                <div class="navbar-user-details">
+                    <span class="navbar-user-name" id="userNameDisplay">XXXXXXXX 様</span>
+                    <span class="badge navbar-status-badge">ログイン中</span>
+                    <button class="btn btn-outline-light navbar-logout-btn" onclick="handleLogout()">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i>ログアウト
+                    </button>
+                </div>
+            </div> -->
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid main-content py-4">
+
+        <!-- Filter & Control Panel -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-3 bg-white rounded">
+                        <div class="d-flex flex-wrap align-items-center gap-4">
+
+                            <!-- Mode Selection -->
+                            <div>
+                                <label class="data-label d-block mb-1">モード選択</label>
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="appMode" id="modeInput" value="input"
+                                        checked onchange="toggleMode()">
+                                    <label class="btn btn-outline-primary btn-sm px-3 fw-bold" for="modeInput">
+                                        <i class="fa-regular fa-pen-to-square me-1"></i>回答する
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="appMode" id="modeHistory"
+                                        value="history" onchange="toggleMode()">
+                                    <label class="btn btn-outline-secondary btn-sm px-3 fw-bold" for="modeHistory">
+                                        <i class="fa-solid fa-clock-rotate-left me-1"></i>履歴確認
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Date Selection & History Nav -->
+                            <div>
+                                <label class="data-label d-block mb-1">対象年月</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <!-- History Navigation Buttons (Hidden by default) -->
+                                    <div class="history-controls btn-group">
+                                        <button class="btn btn-secondary btn-sm"><i
+                                                class="fa-solid fa-chevron-left"></i> 前月</button>
+                                        <button class="btn btn-secondary btn-sm">次月 <i
+                                                class="fa-solid fa-chevron-right"></i></button>
+                                    </div>
+
+                                    <input type="month" class="form-control form-control-sm" value="2013-04"
+                                        style="width: 150px;">
+                                </div>
+                            </div>
+
+                            <!-- Display View Mode (1行 / 全表示) -->
+                            <div>
+                                <label class="data-label d-block mb-1">表示モード</label>
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="viewMode" id="viewModeSingle"
+                                        value="single" checked onchange="toggleViewMode()">
+                                    <label class="btn btn-outline-info btn-sm px-3 fw-bold" for="viewModeSingle">
+                                        <i class="fa-solid fa-grip-lines me-1"></i>1行
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="viewMode" id="viewModeAll" value="all"
+                                        onchange="toggleViewMode()">
+                                    <label class="btn btn-outline-info btn-sm px-3 fw-bold" for="viewModeAll">
+                                        <i class="fa-solid fa-list me-1"></i>全表示
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Display Filter -->
+                            <div id="displayFilterSection" class="pe-md-4">
+                                <label class="data-label d-block mb-1">表示フィルター</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="displayFilter" id="filterAll"
+                                            checked onchange="applyDisplayFilter()">
+                                        <label class="form-check-label small" for="filterAll">全て</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="displayFilter"
+                                            id="filterQuote" onchange="applyDisplayFilter()">
+                                        <label class="form-check-label small" for="filterQuote">見積のみ</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="displayFilter"
+                                            id="filterOrder" onchange="applyDisplayFilter()">
+                                        <label class="form-check-label small" for="filterOrder">注文のみ</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Display Count -->
+                            <div class="ms-md-auto d-flex align-items-end">
+                                <span class="fw-bold text-dark" style="font-size: 0.95rem;">
+                                    表示件数 : <span id="displayCount">0</span>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data List -->
+
+        <!-- Mode 1: Input Mode (回答する) - demo.html style -->
+        <div id="contentModeInput" class="content-mode-input">
+
+            <!-- ITEM 1: Quote (見積) -->
+            <div class="order-card type-quote p-2">
+                <div class="row g-2">
+                    <!-- Header of Card -->
+                    <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-1">
+                        <div class="d-flex align-items-center">
+                            <input class="form-check-input me-3" type="checkbox" style="transform: scale(1.2);">
+                            <span class="badge bg-info text-dark me-2 status-badge">見積</span>
+                            <h6 class="mb-0 fw-bold text-primary" style="font-size: 0.95rem;">キャリアローラ C-60</h6>
+                            <span class="badge bg-light text-dark border ms-2">メッキ加工</span>
+                        </div>
+                        <div class="text-end d-flex align-items-end gap-2">
+                            <div>
+                                <div class="data-label">依頼/発注No.</div>
+                                <div class="data-value">0001241 (2013/11/01)</div>
+                            </div>
+                            <button class="btn btn-pdf" onclick="exportQuoteToPDF(this)" title="PDF出力">
+                                <i class="fa-solid fa-file-pdf"></i>PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 1行モード表示 -->
+                    <div class="col-12 card-detail-single">
+                        <div class="single-item">
+                            <label>数量:</label>
+                            <span class="value-display">10 本</span>
+                        </div>
+                        <div class="single-item">
+                            <label>回答単価 (円):</label>
+                            <input type="text" class="form-control form-control-sm text-end" placeholder="0"
+                                style="width: 120px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答運賃 (円):</label>
+                            <input type="text" class="form-control form-control-sm text-end" placeholder="0"
+                                style="width: 120px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答納期:</label>
+                            <select class="form-select form-select-sm" style="width: 150px;">
+                                <option>ご成約後7日以内</option>
+                                <option>即納</option>
+                                <option>要相談</option>
+                            </select>
+                        </div>
+                        <div class="single-item">
+                            <label>回答期限:</label>
+                            <span class="value-display text-danger fw-bold">2013/11/11</span>
+                        </div>
+                        <div class="single-item">
+                            <label>備考:</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="入力してください"
+                                style="width: 200px;">
+                        </div>
+                    </div>
+
+                    <!-- 全表示モード -->
+                    <div class="card-detail-full">
+                        <div class="row g-2">
+                            <div class="col-md-3 border-end">
+                                <div class="mb-2">
+                                    <div class="data-label">工場</div>
+                                    <div class="data-value">本社工場</div>
+                                </div>
+                                <div>
+                                    <div class="data-label">納入先住所</div>
+                                    <div class="address-text" title="XXXXXXXXXX...">XXXXXXXXXX... (Full Address)</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 border-end text-center">
+                                <div class="row">
+                                    <div class="col-6 col-md-12 mb-2">
+                                        <div class="data-label">数量</div>
+                                        <div class="fs-5 fw-bold">10 <small class="text-muted fs-6">本</small></div>
+                                    </div>
+                                    <div class="col-6 col-md-12">
+                                        <div class="data-label">重量</div>
+                                        <div class="data-value">500.000</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 border-end">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="data-label text-primary">回答単価 (円)</label>
+                                        <input type="text" class="form-control text-end" placeholder="0">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label">金額 (円)</label>
+                                        <input type="text" class="form-control text-end bg-readonly" value="99,999,999"
+                                            readonly>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label text-primary">回答運賃 (円)</label>
+                                        <input type="text" class="form-control text-end" placeholder="0">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label">希望納期</label>
+                                        <div class="data-value mt-1">2013/11/30</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="mb-2">
+                                    <label class="data-label text-primary">回答納期</label>
+                                    <select class="form-select form-select-sm">
+                                        <option>ご成約後7日以内</option>
+                                        <option>即納</option>
+                                        <option>要相談</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="data-label">回答期限</label>
+                                    <span class="text-danger fw-bold">2013/11/11</span>
+                                </div>
+                                <div>
+                                    <label class="data-label">備考</label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="入力してください">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ITEM 2: Order (注文) -->
+            <div class="order-card type-order p-2">
+                <div class="row g-2">
+                    <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-1">
+                        <div class="d-flex align-items-center">
+                            <input class="form-check-input me-3" type="checkbox" style="transform: scale(1.2);">
+                            <span class="badge bg-warning text-dark me-2 status-badge">注文</span>
+                            <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.95rem;">キャリアローラ C-60</h6>
+                            <span class="badge bg-light text-dark border ms-2">メッキ加工</span>
+                        </div>
+                        <div class="text-end d-flex align-items-end gap-2">
+                            <div>
+                                <div class="data-label">依頼/発注No.</div>
+                                <div class="data-value">0001141 (2013/11/01)</div>
+                            </div>
+                            <button class="btn btn-pdf" onclick="exportOrderToPDF(this)" title="PDF出力">
+                                <i class="fa-solid fa-file-pdf"></i>PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 1行モード表示 -->
+                    <div class="col-12 card-detail-single">
+                        <div class="single-item">
+                            <label>数量:</label>
+                            <span class="value-display">10 本</span>
+                        </div>
+                        <div class="single-item">
+                            <label>回答単価 (円):</label>
+                            <input type="text" class="form-control form-control-sm text-end" value="9,999,999.99"
+                                style="width: 120px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答運賃 (円):</label>
+                            <input type="text" class="form-control form-control-sm text-end" placeholder="0"
+                                style="width: 120px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答納期:</label>
+                            <input type="date" class="form-control form-control-sm" value="2013-11-25"
+                                style="width: 150px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答期限:</label>
+                            <span class="value-display text-danger fw-bold">2013/11/11</span>
+                        </div>
+                        <div class="single-item">
+                            <label>備考:</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="入力してください"
+                                style="width: 200px;">
+                        </div>
+                    </div>
+
+                    <!-- 全表示モード -->
+                    <div class="card-detail-full">
+                        <div class="row g-2">
+                            <div class="col-md-3 border-end">
+                                <div class="mb-1">
+                                    <div class="data-label">工場</div>
+                                    <div class="data-value">本社工場</div>
+                                </div>
+                                <div>
+                                    <div class="data-label">納入先住所</div>
+                                    <div class="address-text">XXXXXXXXXX...</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 border-end text-center">
+                                <div class="row">
+                                    <div class="col-6 col-md-12 mb-1">
+                                        <div class="data-label">数量</div>
+                                        <div class="fs-6 fw-bold">10 <small class="text-muted"
+                                                style="font-size: 0.75rem;">本</small></div>
+                                    </div>
+                                    <div class="col-6 col-md-12">
+                                        <div class="data-label">重量</div>
+                                        <div class="data-value">500.000</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 border-end">
+                                <div class="row g-1">
+                                    <div class="col-6">
+                                        <label class="data-label text-primary">回答単価 (円)</label>
+                                        <input type="text" class="form-control form-control-sm text-end"
+                                            value="9,999,999.99">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label">金額 (円)</label>
+                                        <input type="text" class="form-control form-control-sm text-end bg-readonly"
+                                            value="99,999,999" readonly>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label text-primary">回答運賃 (円)</label>
+                                        <input type="text" class="form-control form-control-sm text-end"
+                                            placeholder="0">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label">希望納期</label>
+                                        <div class="data-value" style="margin-top: 0.25rem;">2013/11/30</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="mb-1">
+                                    <label class="data-label text-primary">回答納期</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="date" class="form-control" value="2013-11-25">
+                                    </div>
+                                </div>
+                                <div class="mb-1">
+                                    <label class="data-label">回答期限</label>
+                                    <span class="text-danger fw-bold" style="font-size: 0.875rem;">2013/11/11</span>
+                                </div>
+                                <div>
+                                    <label class="data-label">備考</label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="入力してください">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-card type-quote p-2">
+                <div class="row g-2">
+                    <!-- Header of Card -->
+                    <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-1">
+                        <div class="d-flex align-items-center">
+                            <input class="form-check-input me-3" type="checkbox" style="transform: scale(1.2);">
+                            <span class="badge bg-info text-dark me-2 status-badge">見積</span>
+                            <h6 class="mb-0 fw-bold text-primary" style="font-size: 0.95rem;">キャリアローラ C-60</h6>
+                            <span class="badge bg-light text-dark border ms-2">メッキ加工</span>
+                        </div>
+                        <div class="text-end d-flex align-items-end gap-2">
+                            <div>
+                                <div class="data-label">依頼/発注No.</div>
+                                <div class="data-value">0001241 (2013/11/01)</div>
+                            </div>
+                            <button class="btn btn-pdf" onclick="exportQuoteToPDF(this)" title="PDF出力">
+                                <i class="fa-solid fa-file-pdf"></i>PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 1行モード表示 -->
+                    <div class="col-12 card-detail-single">
+                        <div class="single-item">
+                            <label>数量:</label>
+                            <span class="value-display">10 本</span>
+                        </div>
+                        <div class="single-item">
+                            <label>回答単価 (円):</label>
+                            <input type="text" class="form-control form-control-sm text-end" placeholder="0"
+                                style="width: 120px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答運賃 (円):</label>
+                            <input type="text" class="form-control form-control-sm text-end" placeholder="0"
+                                style="width: 120px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答納期:</label>
+                            <select class="form-select form-select-sm" style="width: 150px;">
+                                <option>ご成約後7日以内</option>
+                                <option>即納</option>
+                                <option>要相談</option>
+                            </select>
+                        </div>
+                        <div class="single-item">
+                            <label>回答期限:</label>
+                            <span class="value-display text-danger fw-bold">2013/11/11</span>
+                        </div>
+                        <div class="single-item">
+                            <label>備考:</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="入力してください"
+                                style="width: 200px;">
+                        </div>
+                    </div>
+
+                    <!-- 全表示モード -->
+                    <div class="card-detail-full">
+                        <div class="row g-2">
+                            <div class="col-md-3 border-end">
+                                <div class="mb-2">
+                                    <div class="data-label">工場</div>
+                                    <div class="data-value">本社工場</div>
+                                </div>
+                                <div>
+                                    <div class="data-label">納入先住所</div>
+                                    <div class="address-text" title="XXXXXXXXXX...">XXXXXXXXXX... (Full Address)</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 border-end text-center">
+                                <div class="row">
+                                    <div class="col-6 col-md-12 mb-2">
+                                        <div class="data-label">数量</div>
+                                        <div class="fs-5 fw-bold">10 <small class="text-muted fs-6">本</small></div>
+                                    </div>
+                                    <div class="col-6 col-md-12">
+                                        <div class="data-label">重量</div>
+                                        <div class="data-value">500.000</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 border-end">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="data-label text-primary">回答単価 (円)</label>
+                                        <input type="text" class="form-control text-end" placeholder="0">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label">金額 (円)</label>
+                                        <input type="text" class="form-control text-end bg-readonly" value="99,999,999"
+                                            readonly>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label text-primary">回答運賃 (円)</label>
+                                        <input type="text" class="form-control text-end" placeholder="0">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label">希望納期</label>
+                                        <div class="data-value mt-1">2013/11/30</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="mb-2">
+                                    <label class="data-label text-primary">回答納期</label>
+                                    <select class="form-select form-select-sm">
+                                        <option>ご成約後7日以内</option>
+                                        <option>即納</option>
+                                        <option>要相談</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="data-label">回答期限</label>
+                                    <span class="text-danger fw-bold">2013/11/11</span>
+                                </div>
+                                <div>
+                                    <label class="data-label">備考</label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="入力してください">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="order-card type-order p-2">
+                <div class="row g-2">
+                    <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-1">
+                        <div class="d-flex align-items-center">
+                            <input class="form-check-input me-3" type="checkbox" style="transform: scale(1.2);">
+                            <span class="badge bg-warning text-dark me-2 status-badge">注文</span>
+                            <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.95rem;">キャリアローラ C-60</h6>
+                            <span class="badge bg-light text-dark border ms-2">メッキ加工</span>
+                        </div>
+                        <div class="text-end d-flex align-items-end gap-2">
+                            <div>
+                                <div class="data-label">依頼/発注No.</div>
+                                <div class="data-value">0001141 (2013/11/01)</div>
+                            </div>
+                            <button class="btn btn-pdf" onclick="exportOrderToPDF(this)" title="PDF出力">
+                                <i class="fa-solid fa-file-pdf"></i>PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 1行モード表示 -->
+                    <div class="col-12 card-detail-single">
+                        <div class="single-item">
+                            <label>数量:</label>
+                            <span class="value-display">10 本</span>
+                        </div>
+                        <div class="single-item">
+                            <label>回答単価 (円):</label>
+                            <input type="text" class="form-control form-control-sm text-end" value="9,999,999.99"
+                                style="width: 120px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答運賃 (円):</label>
+                            <input type="text" class="form-control form-control-sm text-end" placeholder="0"
+                                style="width: 120px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答納期:</label>
+                            <input type="date" class="form-control form-control-sm" value="2013-11-25"
+                                style="width: 150px;">
+                        </div>
+                        <div class="single-item">
+                            <label>回答期限:</label>
+                            <span class="value-display text-danger fw-bold">2013/11/11</span>
+                        </div>
+                        <div class="single-item">
+                            <label>備考:</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="入力してください"
+                                style="width: 200px;">
+                        </div>
+                    </div>
+
+                    <!-- 全表示モード -->
+                    <div class="card-detail-full">
+                        <div class="row g-2">
+                            <div class="col-md-3 border-end">
+                                <div class="mb-1">
+                                    <div class="data-label">工場</div>
+                                    <div class="data-value">本社工場</div>
+                                </div>
+                                <div>
+                                    <div class="data-label">納入先住所</div>
+                                    <div class="address-text">XXXXXXXXXX...</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 border-end text-center">
+                                <div class="row">
+                                    <div class="col-6 col-md-12 mb-1">
+                                        <div class="data-label">数量</div>
+                                        <div class="fs-6 fw-bold">10 <small class="text-muted"
+                                                style="font-size: 0.75rem;">本</small></div>
+                                    </div>
+                                    <div class="col-6 col-md-12">
+                                        <div class="data-label">重量</div>
+                                        <div class="data-value">500.000</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 border-end">
+                                <div class="row g-1">
+                                    <div class="col-6">
+                                        <label class="data-label text-primary">回答単価 (円)</label>
+                                        <input type="text" class="form-control form-control-sm text-end"
+                                            value="9,999,999.99">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label">金額 (円)</label>
+                                        <input type="text" class="form-control form-control-sm text-end bg-readonly"
+                                            value="99,999,999" readonly>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label text-primary">回答運賃 (円)</label>
+                                        <input type="text" class="form-control form-control-sm text-end"
+                                            placeholder="0">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="data-label">希望納期</label>
+                                        <div class="data-value" style="margin-top: 0.25rem;">2013/11/30</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="mb-1">
+                                    <label class="data-label text-primary">回答納期</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="date" class="form-control" value="2013-11-25">
+                                    </div>
+                                </div>
+                                <div class="mb-1">
+                                    <label class="data-label">回答期限</label>
+                                    <span class="text-danger fw-bold" style="font-size: 0.875rem;">2013/11/11</span>
+                                </div>
+                                <div>
+                                    <label class="data-label">備考</label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="入力してください">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- End Mode 1: Input Mode -->
+
+        <!-- Mode 2: History Mode (履歴確認) - demo2.html style -->
+        <div id="contentModeHistory" class="content-mode-history">
+
+            <!-- ITEM 1: QUOTE REQUEST (見積依頼) -->
+            <div class="order-card type-quote p-2">
+                <!-- Header Row -->
+                <div class="row align-items-center mb-2 border-bottom pb-1 g-2">
+                    <div class="col-md-6 d-flex align-items-center gap-2">
+                        <!-- <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="chk1" style="transform: scale(1.3);">
+                        <label class="form-check-label fw-bold small ms-1" for="chk1">回答する</label>
+                    </div> -->
+                        <span class="badge badge-type ms-2 px-2 py-1" style="font-size: 0.75rem;">見積依頼</span>
+                        <h6 class="mb-0 fw-bold text-dark ms-2" style="font-size: 0.95rem;">キャリアローラ C-60</h6>
+                    </div>
+                    <div class="col-md-6 text-md-end d-flex justify-content-md-end gap-4 align-items-center">
+                        <div>
+                            <div class="data-label">依頼/発注No.</div>
+                            <div class="font-monospace fw-bold fs-6">0001241</div>
+                        </div>
+                        <div>
+                            <div class="data-label">依頼/発注日</div>
+                            <div class="data-value">2013/04/01</div>
+                        </div>
+                        <button class="btn btn-pdf" onclick="exportQuoteToPDF(this)" title="PDF出力">
+                            <i class="fa-solid fa-file-pdf"></i>PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Details Row -->
+                <div class="row g-2">
+                    <!-- Left Column: Specs & Address -->
+                    <div class="col-lg-4 border-end">
+                        <div class="row mb-1">
+                            <div class="col-6">
+                                <div class="data-label">工場</div>
+                                <div class="data-value">本社工場</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="data-label">加工</div>
+                                <div class="badge bg-light text-dark border">メッキ</div>
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <div class="data-label">納入先住所</div>
+                            <div class="text-address text-truncate">XXXXXXXXXX (Full address hidden)...</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="data-label">数量</div>
+                                <span class="fs-5 fw-bold text-primary">10</span> <span class="small"
+                                    style="font-size: 0.75rem;">本</span>
+                            </div>
+                            <div class="col-6">
+                                <div class="data-label">重量</div>
+                                <span class="fw-bold">500.000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Column: Inputs -->
+                    <div class="col-lg-5 border-end">
+                        <div class="row g-1">
+                            <!-- Unit Price -->
+                            <div class="col-md-6">
+                                <label class="data-label text-primary">回答単価 (円)</label>
+                                <input type="text" class="form-control form-control-sm text-end fw-bold"
+                                    placeholder="123456" readonly>
+                            </div>
+                            <!-- Total Price (Readonly) -->
+                            <div class="col-md-6">
+                                <label class="data-label">金額 (円)</label>
+                                <input type="text" class="form-control form-control-sm text-end bg-readonly"
+                                    value="99,999,999" readonly>
+                            </div>
+                            <!-- Shipping -->
+                            <div class="col-md-6">
+                                <label class="data-label text-primary">回答運賃 (円)</label>
+                                <input type="text" class="form-control form-control-sm text-end" placeholder="123456" readonly>
+                            </div>
+                            <!-- Delivery Date -->
+                            <div class="col-md-6">
+                                <label class="data-label text-primary">回答納期</label>
+                                <select class="form-select form-select-sm" disabled>
+                                    <option>ご成約後7日以内</option>
+                                    <option>即納</option>
+                                    <option>要相談</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Status & Remarks -->
+                    <div class="col-lg-3">
+                        <div class="mb-2">
+                            <label class="data-label">回答期限</label>
+                            <div class="d-flex align-items-center text-danger fw-bold" style="font-size: 0.875rem;">
+                                <i class="fa-regular fa-calendar-xmark me-2"></i> 2013/04/19
+                            </div>
+                        </div>
+                        <div>
+                            <label class="data-label">備考</label>
+                            <textarea class="form-control form-control-sm" rows="2" placeholder="早急に...読み取り専用" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ITEM 2: ORDER (発注) -->
+            <div class="order-card type-order p-2">
+                <!-- Header Row -->
+                <div class="row align-items-center mb-2 border-bottom pb-1 g-2">
+                    <div class="col-md-6 d-flex align-items-center gap-2">
+                        <!-- <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="chk2" style="transform: scale(1.3);">
+                        <label class="form-check-label fw-bold small ms-1" for="chk2">回答する</label>
+                    </div> -->
+                        <span class="badge badge-type ms-2 px-2 py-1" style="font-size: 0.75rem;">発注</span>
+                        <h6 class="mb-0 fw-bold text-dark ms-2" style="font-size: 0.95rem;">キャリアローラ C-60</h6>
+                    </div>
+                    <div class="col-md-6 text-md-end d-flex justify-content-md-end gap-4 align-items-center">
+                        <div>
+                            <div class="data-label">依頼/発注No.</div>
+                            <div class="font-monospace fw-bold fs-6">0001241</div>
+                        </div>
+                        <div>
+                            <div class="data-label">依頼/発注日</div>
+                            <div class="data-value">2013/04/01</div>
+                        </div>
+                        <button class="btn btn-pdf" onclick="exportOrderToPDF(this)" title="PDF出力">
+                            <i class="fa-solid fa-file-pdf"></i>PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Details Row -->
+                <div class="row g-2">
+                    <!-- Left Column -->
+                    <div class="col-lg-4 border-end">
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <div class="data-label">工場</div>
+                                <div class="data-value">本社工場</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="data-label">加工</div>
+                                <div class="badge bg-light text-dark border">メッキ</div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="data-label">納入先住所</div>
+                            <div class="text-address text-truncate">XXXXXXXXXX (Full address hidden)...</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="data-label">数量</div>
+                                <span class="fs-4 fw-bold text-dark">10</span> <span class="small">本</span>
+                            </div>
+                            <div class="col-6">
+                                <div class="data-label">重量</div>
+                                <span class="fw-bold">500.000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Column -->
+                    <div class="col-lg-5 border-end">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="data-label">回答単価 (円)</label>
+                                <input type="text" class="form-control text-end bg-readonly fw-bold"
+                                    value="9,999,999.99" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="data-label">金額 (円)</label>
+                                <input type="text" class="form-control text-end bg-readonly" value="99,999,999"
+                                    readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="data-label text-primary">回答運賃 (円)</label>
+                                <input type="text" class="form-control text-end" placeholder="11111111111111" disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="data-label text-primary">回答納期 (指定あり)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-warning text-dark border-warning"><i
+                                            class="fa-solid fa-calendar-day"></i></span>
+                                    <input type="date" class="form-control border-warning" value="2013-04-30" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label class="data-label">希望納期</label>
+                            <div class="d-flex align-items-center text-dark">
+                                2013/04/19
+                            </div>
+                        </div>
+                        <div>
+                            <label class="data-label">備考</label>
+                            <textarea class="form-control" rows="2" placeholder="備考は読み取り専用です" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- End Mode 2: History Mode -->
+
+    </div>
+
+    <!-- Sticky Footer -->
+    <div class="sticky-footer d-flex justify-content-between align-items-center">
+        <button class="btn btn-primary px-5 py-2 fw-bold shadow hover-lift" id="sendButton" onclick="sendResponses()">
+            <i class="fa-solid fa-paper-plane me-2"></i>送信 (Send)
+        </button>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script to Handle Mode Toggle -->
+    <script src="index.js"></script>
+
+    <!-- ログイン状態管理スクリプト -->
+    <script>
+        // ページ読み込み時にログイン状態をチェック
+        window.addEventListener('DOMContentLoaded', function () {
+            checkLoginStatus();
+            setActiveMenu(); // アクティブなメニュー項目を設定
+        });
+
+        // アクティブなメニュー項目を設定
+        function setActiveMenu() {
+            const currentPage = window.location.pathname.split('/').pop() || 'supplier_ui.html';
+            const navLinks = document.querySelectorAll('.dropdown-item');
+            
+            navLinks.forEach(link => {
+                if (link.onclick) return; // ログアウトリンクは除外
+                link.classList.remove('active');
+                const href = link.getAttribute('href');
+                if (href && (currentPage === href || (currentPage === '' && href === 'supplier_ui.html'))) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // ログイン状態をチェック
+        function checkLoginStatus() {
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+
+            if (!loggedInUser) {
+                // ログインしていない場合はlogin.htmlにリダイレクト
+                alert('ログインが必要です。');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // ログイン情報を表示
+            try {
+                const user = JSON.parse(loggedInUser);
+                document.getElementById('companyNameDisplay').textContent = user.company_name || '株式会社XXXXXXXX';
+                document.getElementById('userNameDisplay').textContent = (user.user_name || 'ユーザー') + ' 様';
+            } catch (e) {
+                console.error('ユーザー情報の読み込みに失敗しました:', e);
+            }
+        }
+
+        // ログアウト処理
+        function handleLogout() {
+            if (confirm('ログアウトしてもよろしいですか？')) {
+                sessionStorage.removeItem('loggedInUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 表示モード切り替え機能
+        function toggleViewMode() {
+            const viewModeSingle = document.getElementById('viewModeSingle');
+            const viewModeAll = document.getElementById('viewModeAll');
+            const body = document.body;
+
+            if (viewModeSingle.checked) {
+                // 1行モード
+                body.classList.remove('view-mode-all');
+                body.classList.add('view-mode-single');
+            } else if (viewModeAll.checked) {
+                // 全表示モード
+                body.classList.remove('view-mode-single');
+                body.classList.add('view-mode-all');
+            }
+        }
+
+        // ページ読み込み時に表示モードを初期化
+        window.addEventListener('DOMContentLoaded', function () {
+            toggleViewMode();
+            applyDisplayFilter(); // フィルターを初期化
+        });
+
+        // 表示フィルターを適用する関数
+        function applyDisplayFilter() {
+            const isInput = document.getElementById('modeInput').checked;
+            const isHistory = document.getElementById('modeHistory').checked;
+
+            let container = null;
+
+            if (isInput) {
+                // 回答するモード: contentModeInput内のカードをフィルター
+                container = document.getElementById('contentModeInput');
+            } else if (isHistory) {
+                // 履歴確認モード: contentModeHistory内のカードをフィルター
+                container = document.getElementById('contentModeHistory');
+            }
+
+            if (!container || container.style.display === 'none') {
+                updateDisplayCount();
+                return;
+            }
+
+            // フィルター状態を取得
+            const filterAll = document.getElementById('filterAll').checked;
+            const filterQuote = document.getElementById('filterQuote').checked;
+            const filterOrder = document.getElementById('filterOrder').checked;
+
+            // すべてのカードを取得
+            const allCards = container.querySelectorAll('.order-card');
+
+            allCards.forEach(card => {
+                const isQuote = card.classList.contains('type-quote');
+                const isOrder = card.classList.contains('type-order');
+
+                // フィルターに応じて表示/非表示を切り替え
+                if (filterAll) {
+                    // 全て表示
+                    card.style.display = '';
+                } else if (filterQuote && isQuote) {
+                    // 見積のみ表示
+                    card.style.display = '';
+                } else if (filterOrder && isOrder) {
+                    // 注文のみ表示
+                    card.style.display = '';
+                } else {
+                    // 非表示
+                    card.style.display = 'none';
+                }
+            });
+
+            // 表示件数を更新
+            updateDisplayCount();
+        }
+
+        // PDFファイルをダウンロードする共通関数
+        function downloadPDF(pdfFileName) {
+            // PDFファイルのパス（同じディレクトリにある場合）
+            const pdfPath = pdfFileName;
+            
+            // fetch APIを使用してPDFファイルを取得
+            fetch(pdfPath)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('PDFファイルの読み込みに失敗しました。');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    // Blob URLを作成
+                    const url = window.URL.createObjectURL(blob);
+                    
+                    // ダウンロード用のリンクを作成
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = pdfFileName; // ダウンロード時のファイル名
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // クリーンアップ
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(error => {
+                    console.error('PDFダウンロードエラー:', error);
+                    alert('PDFファイルのダウンロードに失敗しました。\nファイルが存在することを確認してください。');
+                });
+        }
+
+        // 注文カードをPDF出力する関数
+        function exportOrderToPDF(button) {
+            // ボタンから注文カードを取得
+            const orderCard = button.closest('.order-card');
+            if (!orderCard) {
+                alert('注文情報を取得できませんでした。');
+                return;
+            }
+
+            // 既存のPDFファイルをダウンロード
+            const pdfFileName = 'JPS_購買業務のEDI移行のご案内.pdf';
+            downloadPDF(pdfFileName);
+        }
+
+        // 見積カードをPDF出力する関数
+        function exportQuoteToPDF(button) {
+            // ボタンから見積カードを取得
+            const quoteCard = button.closest('.order-card');
+            if (!quoteCard) {
+                alert('見積情報を取得できませんでした。');
+                return;
+            }
+
+            // 既存のPDFファイルをダウンロード
+            const pdfFileName = 'JPS_購買業務のEDI移行のご案内.pdf';
+            downloadPDF(pdfFileName);
+        }
+    </script>
+
+</body>
+
+</html>

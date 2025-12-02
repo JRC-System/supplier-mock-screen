@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JRC - 仕入先登録</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* グローバルスタイル */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Navbar Styling - モダンで洗練されたデザイン */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            padding: 1rem 1.5rem;
+            border-bottom: none;
+            position: relative;
+            overflow: visible;
+            z-index: 1050;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .navbar-brand .logo-placeholder {
+            height: 45px;
+            width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #667eea;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar-brand .logo-placeholder::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+
+        .navbar-brand .logo-placeholder:hover::before {
+            left: 100%;
+        }
+
+        .navbar-brand .logo-placeholder:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .navbar-brand span {
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ヘッダー右側のユーザー情報エリア */
+        .navbar-user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* ユーザー情報表示エリア（新しい構造） */
+        .navbar .d-flex.align-items-center {
+            gap: 1rem;
+        }
+
+        .navbar .d-flex.flex-column {
+            gap: 0.25rem;
+        }
+
+        .navbar .d-flex.flex-column small {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .navbar .d-flex.flex-column span {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+        }
+
+        .navbar-company-name {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            margin: 0;
+        }
+
+        .navbar-user-details {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .navbar-user-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-status-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            padding: 0.35em 0.7em;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        .navbar-logout-btn {
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            color: #ffffff;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+        }
+
+        .navbar-logout-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            color: #ffffff;
+        }
+
+        .navbar-brand-text {
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        /* ドロップダウンメニューのスタイル */
+        #dropdownMenuLink {
+            color: rgba(255, 255, 255, 0.98) !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            text-decoration: none;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #dropdownMenuLink::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        #dropdownMenuLink:hover::before {
+            left: 100%;
+        }
+
+        #dropdownMenuLink:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%);
+            color: #ffffff !important;
+            transform: translateY(-3px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        #dropdownMenuLink:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+
+        #dropdownMenuLink::after {
+            margin-left: 0.5rem;
+            border-top-color: rgba(255, 255, 255, 0.9);
+            transition: transform 0.3s ease;
+        }
+
+        #dropdownMenuLink[aria-expanded="true"]::after {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border: none;
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            min-width: 240px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            backdrop-filter: blur(20px);
+            animation: slideDown 0.3s ease-out;
+            z-index: 1051 !important;
+            position: absolute !important;
+        }
+
+        .dropdown {
+            position: relative;
+            z-index: 1050;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 0.85rem 1.2rem;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 0.35rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
+            transform: translateX(6px);
+            color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .dropdown-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .dropdown-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .dropdown-item.active::before {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scaleY(1);
+        }
+
+        .dropdown-item.active:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            transform: translateX(6px) scale(1.02);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-divider {
+            margin: 0.5rem 0;
+            opacity: 0.2;
+        }
+
+        .dropdown-item.text-danger {
+            color: #dc3545 !important;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #dc3545 !important;
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 991px) {
+            .navbar .d-flex.flex-column {
+                display: none !important;
+            }
+            
+            #dropdownMenuLink {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand-text {
+                display: none !important;
+            }
+
+            .navbar-user-info {
+                align-items: flex-start;
+            }
+
+            .navbar-user-name {
+                font-size: 0.85rem;
+            }
+
+            .navbar-user-details {
+                gap: 0.5rem;
+            }
+
+            .navbar-logout-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+            }
+
+            #dropdownMenuLink {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .dropdown-menu {
+                min-width: 200px;
+            }
+        }
+
+        /* Card Styling */
+        .order-card {
+            background: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
+            margin-bottom: 0.75rem;
+            /* 1.5remから0.75remに削減 */
+            border-left: 5px solid #6c757d;
+            /* Default gray */
+            position: relative;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Type: Quote Request (見積依頼) */
+        .order-card.type-quote {
+            border-left-color: #0dcaf0;
+            /* Cyan */
+        }
+
+        .order-card.type-quote .badge-type {
+            background-color: #0dcaf0;
+            color: #000;
+        }
+
+        /* Type: Order (発注) */
+        .order-card.type-order {
+            border-left-color: #ffc107;
+            /* Warning/Yellow */
+        }
+
+        .order-card.type-order .badge-type {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        /* PDF出力ボタンのスタイル */
+        .btn-pdf {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-pdf:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-pdf i {
+            margin-right: 0.25rem;
+        }
+
+        /* Typography */
+        .data-label {
+            font-size: 0.7rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .data-value {
+            font-size: 0.875rem;
+            /* 0.95remから0.875remに削減 */
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .text-address {
+            font-size: 0.85rem;
+            color: #495057;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px dashed #dee2e6;
+        }
+
+        .address-text {
+            font-size: 0.85rem;
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 0.4em 0.8em;
+        }
+
+        /* モード別コンテンツ表示制御 */
+        .content-mode-input {
+            display: block;
+        }
+
+        .content-mode-history {
+            display: none;
+        }
+
+        /* Inputs */
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .15);
+        }
+
+        .bg-readonly {
+            background-color: #e9ecef;
+            color: #495057;
+            cursor: not-allowed;
+        }
+
+        /* Footer */
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .main-content {
+            padding-bottom: 90px;
+        }
+
+        /* History Controls Hidden by Default */
+        .history-controls {
+            display: none;
+        }
+
+        /* 表示モード: 1行モード */
+        .view-mode-single .order-card .card-detail-full {
+            display: none !important;
+        }
+
+        .view-mode-single .order-card .card-detail-single {
+            display: flex !important;
+        }
+
+        .view-mode-all .order-card .card-detail-full {
+            display: block !important;
+        }
+
+        .view-mode-all .order-card .card-detail-single {
+            display: none !important;
+        }
+
+        /* card-detail-full内のrowを正しく表示 */
+        .card-detail-full {
+            display: block;
+            width: 100%;
+        }
+
+        /* 1行モード用のスタイル */
+        .card-detail-single {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .card-detail-single .single-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .card-detail-single .single-item label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin: 0;
+            min-width: fit-content;
+        }
+
+        .card-detail-single .single-item input,
+        .card-detail-single .single-item select {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            min-width: 100px;
+        }
+
+        .card-detail-single .single-item .value-display {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-3" href="supplier_ui.html">
+                <div class="logo-placeholder">JRC</div>
+                <span class="navbar-brand-text d-none d-md-block">株式会社JRC</span>
+            </a>
+            
+            <!-- トップメニュー（ドロップダウン） -->
+            <div class="d-flex align-items-center ms-auto me-4">
+                <!-- ユーザー情報表示 -->
+                <div class="me-3 d-flex flex-column align-items-end">
+                    <small id="companyNameDisplay" class="text-light fw-bold"></small>
+                    <span id="userNameDisplay" class="text-light small"></span>
+                </div>
+                <!-- メニュードロップダウン -->
+                <div class="dropdown">
+                    <a class="dropdown-toggle" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-bars"></i>
+                        <span>メニュー</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="supplier_ui.html" id="navHome">
+                            <i class="fa-solid fa-house"></i>
+                            <span>ホーム</span>
+                        </a></li>
+                        <li><a class="dropdown-item active" href="supplier-registration.html" id="navRegistration">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>仕入先登録</span>
+                        </a></li>
+                        <li><a class="dropdown-item" href="Notification_setting.html" id="navNotification">
+                            <i class="fa-solid fa-bell"></i>
+                            <span>通知先設定</span>
+                        </a></li>
+                        <li><a class="dropdown-item" href="password_reset.html" id="navPassword">
+                            <i class="fa-solid fa-key"></i>
+                            <span>パスワード再設定</span>
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout(); return false;">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>ログアウト</span>
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+            <script>
+                // ログインユーザー情報（sessionStorageから取得して表示）
+                window.addEventListener('DOMContentLoaded', function() {
+                    let loggedInUser = null;
+                    try {
+                        loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+                    } catch(e){}
+                    if(loggedInUser){
+                        if(document.getElementById('companyNameDisplay'))
+                            document.getElementById('companyNameDisplay').textContent = loggedInUser.company_name || '';
+                        if(document.getElementById('userNameDisplay'))
+                            document.getElementById('userNameDisplay').textContent = (loggedInUser.user_name || '') + ' 様';
+                    }
+                });
+            </script>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">仕入先登録</h2>
+                <p>作成中...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ログイン状態をチェック
+        function checkLoginStatus() {
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            
+            if (!loggedInUser) {
+                alert('ログインが必要です。');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const user = JSON.parse(loggedInUser);
+                document.getElementById('companyNameDisplay').textContent = user.company_name || '株式会社テスト';
+                document.getElementById('userNameDisplay').textContent = (user.user_name || 'ユーザー') + ' 様';
+            } catch (e) {
+                console.error('ユーザー情報の読み込みに失敗しました:', e);
+            }
+        }
+        
+        // ログアウト処理
+        function handleLogout() {
+            if (confirm('ログアウトしてもよろしいですか？')) {
+                sessionStorage.removeItem('loggedInUser');
+                window.location.href = 'login.html';
+            }
+        }
+        
+        // アクティブなメニュー項目を設定
+        function setActiveMenu() {
+            const currentPage = window.location.pathname.split('/').pop() || 'supplier-registration.html';
+            const navLinks = document.querySelectorAll('.dropdown-item');
+            
+            navLinks.forEach(link => {
+                if (link.onclick) return; // ログアウトリンクは除外
+                link.classList.remove('active');
+                const href = link.getAttribute('href');
+                if (href && (currentPage === href || (currentPage === '' && href === 'supplier-registration.html'))) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        // ページ読み込み時に実行
+        window.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            setActiveMenu();
+        });
+    </script>
+</body>
+
+</html>
