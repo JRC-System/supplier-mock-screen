@@ -11,596 +11,514 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- jsPDF for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- 共通スタイルシート -->
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* グローバルスタイル */
-        * {
-            box-sizing: border-box;
+        /* supplier-registration.html固有のスタイル */
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            border-radius: 16px 16px 0 0;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
 
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-            min-height: 100vh;
+        .card-header .btn-sm {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            transition: all 0.3s ease;
         }
 
-        /* Navbar Styling - モダンで洗練されたデザイン */
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%) !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-            padding: 1rem 1.5rem;
-            border-bottom: none;
+        .card-header .btn-sm:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+
+        .required-label::after {
+            content: " *";
+            color: red;
+        }
+
+        .main-content {
+            padding-bottom: 2rem;
+        }
+
+        /* 検索バーと新規登録ボタンのスタイル */
+        .search-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
             position: relative;
-            overflow: visible;
-            z-index: 1050;
+            overflow: hidden;
         }
 
-        .navbar::before {
+        .search-section::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
-            pointer-events: none;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
         }
 
-        .navbar-brand {
-            font-weight: 700;
-            transition: all 0.3s ease;
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
 
-        .navbar-brand:hover {
-            transform: translateY(-1px);
+        .search-section .form-label {
+            color: #374151;
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
         }
 
-        .navbar-brand .logo-placeholder {
-            height: 45px;
-            width: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
+        .search-section .form-label i {
             color: #667eea;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 1rem;
-            position: relative;
-            overflow: hidden;
         }
 
-        .navbar-brand .logo-placeholder::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transform: rotate(45deg);
-            transition: all 0.6s;
-        }
-
-        .navbar-brand .logo-placeholder:hover::before {
-            left: 100%;
-        }
-
-        .navbar-brand .logo-placeholder:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-        }
-
-        .navbar-brand span {
+        .search-section .form-control {
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            padding: 0.75rem 1rem;
             font-size: 0.95rem;
-            letter-spacing: 0.5px;
-            font-weight: 500;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        /* ヘッダー右側のユーザー情報エリア */
-        .navbar-user-info {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 0.5rem;
-        }
-
-        /* ユーザー情報表示エリア（新しい構造） */
-        .navbar .d-flex.align-items-center {
-            gap: 1rem;
-        }
-
-        .navbar .d-flex.flex-column {
-            gap: 0.25rem;
-        }
-
-        .navbar .d-flex.flex-column small {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
-        .navbar .d-flex.flex-column span {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 500;
-        }
-
-        .navbar-company-name {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            margin: 0;
-        }
-
-        .navbar-user-details {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .navbar-user-name {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        }
-
-        .navbar-status-badge {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-            padding: 0.35em 0.7em;
-            font-size: 0.7rem;
-            font-weight: 600;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            letter-spacing: 0.5px;
-            border: none;
-        }
-
-        .navbar-logout-btn {
-            border: 1.5px solid rgba(255, 255, 255, 0.5);
-            color: #ffffff;
-            font-weight: 500;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
             transition: all 0.3s ease;
-            font-size: 0.8rem;
-            letter-spacing: 0.3px;
+            background: white;
         }
 
-        .navbar-logout-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.8);
+        .search-section .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            color: #ffffff;
         }
 
-        .navbar-brand-text {
-            font-size: 0.95rem;
-            letter-spacing: 0.5px;
-            font-weight: 500;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            color: rgba(255, 255, 255, 0.95);
-        }
-
-        /* ドロップダウンメニューのスタイル */
-        #dropdownMenuLink {
-            color: rgba(255, 255, 255, 0.98) !important;
-            font-weight: 600;
-            font-size: 0.95rem;
+        .btn-search {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
             padding: 0.7rem 1.5rem;
-            border-radius: 12px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
             display: inline-flex;
             align-items: center;
-            gap: 0.6rem;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-            text-decoration: none;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            gap: 0.5rem;
             position: relative;
             overflow: hidden;
         }
 
-        #dropdownMenuLink::before {
+        .btn-search::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
         }
 
-        #dropdownMenuLink:hover::before {
-            left: 100%;
+        .btn-search:hover::before {
+            width: 200px;
+            height: 200px;
         }
 
-        #dropdownMenuLink:hover {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%);
-            color: #ffffff !important;
-            transform: translateY(-3px) scale(1.02);
-            border-color: rgba(255, 255, 255, 0.7);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            color: white;
         }
 
-        #dropdownMenuLink:focus {
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
-            outline: none;
+        .btn-search:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.35);
         }
 
-        #dropdownMenuLink::after {
-            margin-left: 0.5rem;
-            border-top-color: rgba(255, 255, 255, 0.9);
-            transition: transform 0.3s ease;
-        }
-
-        #dropdownMenuLink[aria-expanded="true"]::after {
-            transform: rotate(180deg);
-        }
-
-        .dropdown-menu {
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        .btn-new {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border: none;
-            margin-top: 0.75rem;
-            padding: 0.75rem;
-            min-width: 240px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            backdrop-filter: blur(20px);
-            animation: slideDown 0.3s ease-out;
-            z-index: 1051 !important;
-            position: absolute !important;
-        }
-
-        .dropdown {
-            position: relative;
-            z-index: 1050;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .dropdown-item {
-            padding: 0.85rem 1.2rem;
+            color: white;
+            padding: 0.7rem 1.5rem;
             border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+            display: inline-flex;
             align-items: center;
-            gap: 0.85rem;
-            color: #374151;
-            font-weight: 500;
-            font-size: 0.95rem;
-            margin-bottom: 0.35rem;
+            gap: 0.5rem;
             position: relative;
             overflow: hidden;
         }
 
-        .dropdown-item::before {
+        .btn-new::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
         }
 
-        .dropdown-item:last-child {
+        .btn-new:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .btn-new:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .btn-new:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+        }
+
+        /* 一覧テーブルのスタイル */
+        .supplier-table {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .supplier-table table {
             margin-bottom: 0;
         }
 
-        .dropdown-item:hover {
-            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
-            transform: translateX(6px);
-            color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-        }
-
-        .dropdown-item:hover::before {
-            transform: scaleY(1);
-        }
-
-        .dropdown-item.active {
+        .supplier-table thead {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .dropdown-item.active::before {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scaleY(1);
-        }
-
-        .dropdown-item.active:hover {
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-            color: white;
-            transform: translateX(6px) scale(1.02);
-        }
-
-        .dropdown-item i {
-            width: 20px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .dropdown-divider {
-            margin: 0.5rem 0;
-            opacity: 0.2;
-        }
-
-        .dropdown-item.text-danger {
-            color: #dc3545 !important;
-        }
-
-        .dropdown-item.text-danger:hover {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            color: #dc3545 !important;
-        }
-
-        /* レスポンシブ対応 */
-        @media (max-width: 991px) {
-            .navbar .d-flex.flex-column {
-                display: none !important;
-            }
-            
-            #dropdownMenuLink {
-                padding: 0.5rem 1rem;
-                font-size: 0.85rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .navbar-brand-text {
-                display: none !important;
-            }
-
-            .navbar-user-info {
-                align-items: flex-start;
-            }
-
-            .navbar-user-name {
-                font-size: 0.85rem;
-            }
-
-            .navbar-user-details {
-                gap: 0.5rem;
-            }
-
-            .navbar-logout-btn {
-                padding: 0.3rem 0.6rem;
-                font-size: 0.75rem;
-            }
-
-            #dropdownMenuLink {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-            }
-
-            .dropdown-menu {
-                min-width: 200px;
-            }
-        }
-
-        /* Card Styling */
-        .order-card {
-            background: #fff;
-            border: 1px solid #e1e4e8;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-            transition: all 0.2s;
-            margin-bottom: 0.75rem;
-            /* 1.5remから0.75remに削減 */
-            border-left: 5px solid #6c757d;
-            /* Default gray */
             position: relative;
         }
 
-        .order-card:hover {
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        /* Type: Quote Request (見積依頼) */
-        .order-card.type-quote {
-            border-left-color: #0dcaf0;
-            /* Cyan */
-        }
-
-        .order-card.type-quote .badge-type {
-            background-color: #0dcaf0;
-            color: #000;
-        }
-
-        /* Type: Order (発注) */
-        .order-card.type-order {
-            border-left-color: #ffc107;
-            /* Warning/Yellow */
-        }
-
-        .order-card.type-order .badge-type {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        /* PDF出力ボタンのスタイル */
-        .btn-pdf {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .btn-pdf:hover {
-            background-color: #c82333;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-pdf i {
-            margin-right: 0.25rem;
-        }
-
-        /* Typography */
-        .data-label {
-            font-size: 0.7rem;
-            color: #6c757d;
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 2px;
-            letter-spacing: 0.5px;
-        }
-
-        .data-value {
-            font-size: 0.875rem;
-            /* 0.95remから0.875remに削減 */
-            font-weight: 500;
-            color: #212529;
-        }
-
-        .text-address {
-            font-size: 0.85rem;
-            color: #495057;
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 4px;
-            border: 1px dashed #dee2e6;
-        }
-
-        .address-text {
-            font-size: 0.85rem;
-            color: #555;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .status-badge {
-            font-size: 0.85rem;
-            padding: 0.4em 0.8em;
-        }
-
-        /* モード別コンテンツ表示制御 */
-        .content-mode-input {
-            display: block;
-        }
-
-        .content-mode-history {
-            display: none;
-        }
-
-        /* Inputs */
-        .form-control:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .15);
-        }
-
-        .bg-readonly {
-            background-color: #e9ecef;
-            color: #495057;
-            cursor: not-allowed;
-        }
-
-        /* Footer */
-        .sticky-footer {
-            position: fixed;
+        .supplier-table thead::after {
+            content: '';
+            position: absolute;
             bottom: 0;
-            width: 100%;
-            background: white;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        }
+
+        .supplier-table thead th {
+            border: none;
+            padding: 1.25rem 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .supplier-table tbody tr {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .supplier-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .supplier-table tbody tr:hover {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .supplier-table tbody td {
             padding: 1rem;
-            border-top: 1px solid #dee2e6;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-            z-index: 1000;
+            vertical-align: middle;
+            color: #374151;
+            font-size: 0.9rem;
         }
 
-        .main-content {
-            padding-bottom: 90px;
+        .supplier-table tbody td:last-child {
+            padding: 0.75rem 1rem;
         }
 
-        /* History Controls Hidden by Default */
-        .history-controls {
-            display: none;
-        }
-
-        /* 表示モード: 1行モード */
-        .view-mode-single .order-card .card-detail-full {
-            display: none !important;
-        }
-
-        .view-mode-single .order-card .card-detail-single {
-            display: flex !important;
-        }
-
-        .view-mode-all .order-card .card-detail-full {
-            display: block !important;
-        }
-
-        .view-mode-all .order-card .card-detail-single {
-            display: none !important;
-        }
-
-        /* card-detail-full内のrowを正しく表示 */
-        .card-detail-full {
-            display: block;
-            width: 100%;
-        }
-
-        /* 1行モード用のスタイル */
-        .card-detail-single {
-            display: none;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.5rem 0;
-            flex-wrap: wrap;
-        }
-
-        .card-detail-single .single-item {
+        .action-buttons {
             display: flex;
+            gap: 0.6rem;
+            justify-content: center;
             align-items: center;
-            gap: 0.5rem;
-            white-space: nowrap;
         }
 
-        .card-detail-single .single-item label {
-            font-size: 0.75rem;
-            color: #6c757d;
-            margin: 0;
-            min-width: fit-content;
-        }
-
-        .card-detail-single .single-item input,
-        .card-detail-single .single-item select {
-            font-size: 0.85rem;
-            padding: 0.25rem 0.5rem;
-            min-width: 100px;
-        }
-
-        .card-detail-single .single-item .value-display {
-            font-size: 0.875rem;
+        .btn-edit {
+            background: white;
+            border: 1.5px solid #d1d5db;
+            color: #3b82f6;
+           /* // padding: 0 !important; */
+            padding-top: 20px !important;
+            border-radius: 8px;
+            font-size: 0;
             font-weight: 500;
-            color: #212529;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            width: 38px !important;
+            height: 38px !important;
+            min-width: 38px;
+            min-height: 38px;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer;
+            position: relative;
+            margin: 0;
+        }
+
+        .btn-edit i {
+            font-size: 0.95rem;
+            color: #3b82f6;
+            -webkit-text-stroke: 1px #3b82f6;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            width: auto;
+            height: auto;
+        }
+
+        .btn-edit:hover {
+            background: #f8f9ff;
+            border-color: #3b82f6;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .btn-edit:hover i {
+            -webkit-text-stroke: 1px #2563eb;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-edit:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-delete-list {
+            background: white;
+            border: 1.5px solid #ef4444;
+            color: #ef4444;
+            padding-top: 20px !important;
+            border-radius: 8px;
+            font-size: 0;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            width: 38px !important;
+            height: 38px !important;
+            min-width: 38px;
+            min-height: 38px;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer;
+            position: relative;
+            margin: 0;
+        }
+
+        .btn-delete-list i {
+            font-size: 0.95rem;
+            color: #ef4444;
+            -webkit-text-stroke: 1px #ef4444;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
+            width: auto;
+            height: auto;
+        }
+
+        .btn-delete-list:hover {
+            background: #fef2f2;
+            border-color: #dc2626;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .btn-delete-list:hover i {
+            -webkit-text-stroke: 1px #dc2626;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-delete-list:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* フォームセクションの表示/非表示 */
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .list-section {
+            display: block;
+        }
+
+        .list-section.hidden {
+            display: none;
+        }
+
+        /* ページタイトルのスタイル */
+        .page-title-section {
+            margin-bottom: 2rem;
+        }
+
+        .page-title-section h2 {
+            color: #1f2937;
+            font-weight: 700;
+            font-size: 1.75rem;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-title-section .badge {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
+        }
+
+        /* 空の状態のスタイル */
+        .supplier-table tbody tr td.text-center {
+            padding: 3rem 1rem;
+        }
+
+        .supplier-table tbody tr td.text-center i {
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+
+        /* フォーム内のボタンスタイル */
+        .form-section .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .form-section .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .form-section .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: none;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .form-section .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .form-section .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border: none;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .form-section .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .form-section .btn-outline-secondary {
+            border: 2px solid #6b7280;
+            color: #6b7280;
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            background: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .form-section .btn-outline-secondary:hover {
+            background: #6b7280;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .search-section {
+                padding: 1.25rem;
+            }
+
+            .search-section .row {
+                gap: 1rem;
+            }
+
+            .search-section .col-md-6 {
+                margin-bottom: 1rem;
+            }
+
+            .btn-search,
+            .btn-new {
+            width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            .supplier-table {
+                overflow-x: auto;
+            }
+
+            .supplier-table table {
+                min-width: 800px;
+            }
         }
     </style>
 </head>
@@ -639,9 +557,9 @@
                             <i class="fa-solid fa-bell"></i>
                             <span>通知先設定</span>
                         </a></li>
-                        <li><a class="dropdown-item" href="password_reset.html" id="navPassword">
-                            <i class="fa-solid fa-key"></i>
-                            <span>パスワード再設定</span>
+                        <li><a class="dropdown-item" href="AccountSettings.html" id="navAccount">
+                            <i class="fa-solid fa-user-cog"></i>
+                            <span>アカウント設定</span>
                         </a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout(); return false;">
@@ -670,11 +588,363 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container-fluid py-4">
-        <div class="row">
-            <div class="col-12">
-                <h2 class="mb-4">仕入先登録</h2>
-                <p>作成中...</p>
+    <div class="container mb-5 main-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                
+                <!-- Page Title -->
+                <div class="d-flex justify-content-between align-items-center page-title-section">
+                    <h2><i class="fas fa-building me-2"></i>仕入先情報管理</h2>
+                    <span class="badge bg-secondary">自部門用</span>
+                </div>
+
+                <!-- 検索セクション -->
+                <div class="search-section list-section">
+                    <div class="row align-items-end">
+                        <div class="col-md-6">
+                            <label for="searchInput" class="form-label fw-bold">
+                                <i class="fas fa-search me-2"></i>検索
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="searchInput" placeholder="会社名、メールアドレス、電話番号で検索..." onkeypress="handleSearchKeyPress(event)">
+                                <button type="button" class="btn btn-search" onclick="handleSearch()">
+                                    <i class="fas fa-search me-2"></i>検索
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <label class="form-label d-block" style="visibility: hidden;">スペーサー</label>
+                            <button type="button" class="btn btn-new" onclick="showNewSupplierModal()">
+                                <i class="fas fa-plus me-2"></i>新規登録
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 仕入先一覧 -->
+                <div class="supplier-table list-section">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>会社名</th>
+                                <th>代表者名</th>
+                                <th>メールアドレス</th>
+                                <th>電話番号</th>
+                                <th>所在地</th>
+                                <th class="text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supplierTableBody">
+                            <!-- データはJavaScriptで動的に生成 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Notification Alert -->
+                <div class="alert alert-info border-info fade show form-section" role="alert" id="formAlert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>新規登録時の注意:</strong> 登録ボタンを押すと、入力されたメールアドレス宛に招待メールが送信されます。<br>
+                    <small class="text-muted">※パスワードは仕入先担当者がメール内のURLからご自身で設定します。</small>
+                </div>
+
+                <!-- Main Form Card -->
+                <div class="card shadow-sm form-section" id="formCard">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-edit me-2"></i>仕入先登録・変更</span>
+                            <button type="button" class="btn btn-sm btn-light" onclick="showList()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="supplierForm" class="needs-validation" novalidate>
+                            
+                            <!-- Section: Basic Info -->
+                            <h5 class="mb-3 text-primary border-bottom pb-2">基本情報</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="companyName" class="form-label required-label">会社名 (仕入先名)</label>
+                                    <input type="text" class="form-control" id="companyName" placeholder="例：株式会社テックサプライ" required>
+                                    <div class="invalid-feedback">会社名を入力してください。</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="repName" class="form-label">代表者名 / 担当者名</label>
+                                    <input type="text" class="form-control" id="repName" placeholder="例：山田 太郎">
+                                </div>
+                            </div>
+
+                            <!-- Section: Contact Info -->
+                            <h5 class="mb-3 text-primary border-bottom pb-2">連絡先情報</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label required-label">メールアドレス</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
+                                        <div class="invalid-feedback">有効なメールアドレスを入力してください（招待メール送信先）。</div>
+                                    </div>
+                                    <div class="form-text text-danger">※このアドレスに登録通知が送信されます。</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label required-label">電話番号</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        <input type="tel" class="form-control" id="phone" placeholder="03-1234-5678" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Address -->
+                            <h5 class="mb-3 text-primary border-bottom pb-2">所在地</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label for="zipCode" class="form-label">郵便番号</label>
+                                    <input type="text" class="form-control" id="zipCode" placeholder="123-4567">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="prefecture" class="form-label">都道府県</label>
+                                    <select class="form-select" id="prefecture">
+                                        <option selected disabled value="">選択...</option>
+                                        <option>東京都</option>
+                                        <option>大阪府</option>
+                                        <option>その他</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="address" class="form-label">住所 (市区町村・番地)</label>
+                                    <input type="text" class="form-control" id="address" placeholder="例：千代田区1-1-1">
+                                </div>
+                                <div class="col-12">
+                                    <label for="building" class="form-label">建物名・階数</label>
+                                    <input type="text" class="form-control" id="building" placeholder="例：テックビル 5F">
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                                <!-- Back Button -->
+                                <button type="button" class="btn btn-outline-secondary" onclick="showList()">
+                                    <i class="fas fa-arrow-left me-1"></i> 一覧へ戻る
+                                </button>
+
+                                <!-- CRUD Buttons -->
+                                <div class="d-flex gap-2">
+                                    <!-- Delete Button (Usually only shown in Edit mode) -->
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" id="deleteButton" style="display: none;">
+                                        <i class="fas fa-trash-alt me-1"></i> 削除
+                                    </button>
+                                    
+                                    <!-- Update Button (Usually only shown in Edit mode) -->
+                                    <button type="submit" class="btn btn-warning text-white" id="updateButton" style="display: none;">
+                                        <i class="fas fa-sync-alt me-1"></i> 更新
+                                    </button>
+
+                                    <!-- Register Button (Only shown in New mode) -->
+                                    <button type="submit" class="btn btn-primary" id="registerButton">
+                                        <i class="fas fa-paper-plane me-1"></i> 新規登録 (メール送信)
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Supplier Registration Modal -->
+    <div class="modal fade" id="newSupplierModal" tabindex="-1" aria-labelledby="newSupplierModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h5 class="modal-title" id="newSupplierModalLabel">
+                        <i class="fas fa-user-plus me-2"></i>新規仕入先登録
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info border-info mb-3" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>新規登録時の注意:</strong> 登録ボタンを押すと、入力されたメールアドレス宛に招待メールが送信されます。<br>
+                        <small class="text-muted">※パスワードは仕入先担当者がメール内のURLからご自身で設定します。</small>
+                    </div>
+                    <form id="newSupplierForm" class="needs-validation" novalidate>
+                        <!-- Section: Basic Info -->
+                        <h5 class="mb-3 text-primary border-bottom pb-2">基本情報</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="modalCompanyName" class="form-label required-label">会社名 (仕入先名)</label>
+                                <input type="text" class="form-control" id="modalCompanyName" placeholder="例：株式会社テックサプライ" required>
+                                <div class="invalid-feedback">会社名を入力してください。</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="modalRepName" class="form-label">代表者名 / 担当者名</label>
+                                <input type="text" class="form-control" id="modalRepName" placeholder="例：山田 太郎">
+                            </div>
+                        </div>
+
+                        <!-- Section: Contact Info -->
+                        <h5 class="mb-3 text-primary border-bottom pb-2">連絡先情報</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="modalEmail" class="form-label required-label">メールアドレス</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="modalEmail" placeholder="name@example.com" required>
+                                    <div class="invalid-feedback">有効なメールアドレスを入力してください（招待メール送信先）。</div>
+                                </div>
+                                <div class="form-text text-danger">※このアドレスに登録通知が送信されます。</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="modalPhone" class="form-label required-label">電話番号</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="tel" class="form-control" id="modalPhone" placeholder="03-1234-5678" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: Address -->
+                        <h5 class="mb-3 text-primary border-bottom pb-2">所在地</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="modalZipCode" class="form-label">郵便番号</label>
+                                <input type="text" class="form-control" id="modalZipCode" placeholder="123-4567">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="modalPrefecture" class="form-label">都道府県</label>
+                                <select class="form-select" id="modalPrefecture">
+                                    <option selected disabled value="">選択...</option>
+                                    <option>東京都</option>
+                                    <option>大阪府</option>
+                                    <option>その他</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="modalAddress" class="form-label">住所 (市区町村・番地)</label>
+                                <input type="text" class="form-control" id="modalAddress" placeholder="例：千代田区1-1-1">
+                            </div>
+                            <div class="col-12">
+                                <label for="modalBuilding" class="form-label">建物名・階数</label>
+                                <input type="text" class="form-control" id="modalBuilding" placeholder="例：テックビル 5F">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="button" class="btn btn-primary" onclick="handleNewSupplierSubmit()">
+                        <i class="fas fa-paper-plane me-1"></i>新規登録 (メール送信)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Supplier Modal -->
+    <div class="modal fade" id="editSupplierModal" tabindex="-1" aria-labelledby="editSupplierModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                    <h5 class="modal-title" id="editSupplierModalLabel">
+                        <i class="fas fa-edit me-2"></i>仕入先情報編集
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editSupplierForm" class="needs-validation" novalidate>
+                        <!-- Section: Basic Info -->
+                        <h5 class="mb-3 text-primary border-bottom pb-2">基本情報</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="editModalCompanyName" class="form-label required-label">会社名 (仕入先名)</label>
+                                <input type="text" class="form-control" id="editModalCompanyName" placeholder="例：株式会社テックサプライ" required>
+                                <div class="invalid-feedback">会社名を入力してください。</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editModalRepName" class="form-label">代表者名 / 担当者名</label>
+                                <input type="text" class="form-control" id="editModalRepName" placeholder="例：山田 太郎">
+                            </div>
+                        </div>
+
+                        <!-- Section: Contact Info -->
+                        <h5 class="mb-3 text-primary border-bottom pb-2">連絡先情報</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="editModalEmail" class="form-label required-label">メールアドレス</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control" id="editModalEmail" placeholder="name@example.com" required>
+                                    <div class="invalid-feedback">有効なメールアドレスを入力してください（招待メール送信先）。</div>
+                                </div>
+                                <div class="form-text text-danger">※このアドレスに登録通知が送信されます。</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editModalPhone" class="form-label required-label">電話番号</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="tel" class="form-control" id="editModalPhone" placeholder="03-1234-5678" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: Address -->
+                        <h5 class="mb-3 text-primary border-bottom pb-2">所在地</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="editModalZipCode" class="form-label">郵便番号</label>
+                                <input type="text" class="form-control" id="editModalZipCode" placeholder="123-4567">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editModalPrefecture" class="form-label">都道府県</label>
+                                <select class="form-select" id="editModalPrefecture">
+                                    <option selected disabled value="">選択...</option>
+                                    <option>東京都</option>
+                                    <option>大阪府</option>
+                                    <option>その他</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="editModalAddress" class="form-label">住所 (市区町村・番地)</label>
+                                <input type="text" class="form-control" id="editModalAddress" placeholder="例：千代田区1-1-1">
+                            </div>
+                            <div class="col-12">
+                                <label for="editModalBuilding" class="form-label">建物名・階数</label>
+                                <input type="text" class="form-control" id="editModalBuilding" placeholder="例：テックビル 5F">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="button" class="btn btn-danger" onclick="handleEditSupplierDelete()" id="editModalDeleteButton">
+                        <i class="fas fa-trash-alt me-1"></i>削除
+                    </button>
+                    <button type="button" class="btn btn-warning text-white" onclick="handleEditSupplierSubmit()">
+                        <i class="fas fa-sync-alt me-1"></i>更新
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">削除確認</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    本当にこの仕入先情報を削除してもよろしいですか？<br>
+                    <span class="text-danger small">※この操作は取り消せません。</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="button" class="btn btn-danger" onclick="handleDelete()">削除する</button>
+                </div>
             </div>
         </div>
     </div>
@@ -694,8 +964,12 @@
             
             try {
                 const user = JSON.parse(loggedInUser);
-                document.getElementById('companyNameDisplay').textContent = user.company_name || '株式会社テスト';
-                document.getElementById('userNameDisplay').textContent = (user.user_name || 'ユーザー') + ' 様';
+                if (document.getElementById('companyNameDisplay')) {
+                    document.getElementById('companyNameDisplay').textContent = user.company_name || '株式会社テスト';
+                }
+                if (document.getElementById('userNameDisplay')) {
+                    document.getElementById('userNameDisplay').textContent = (user.user_name || 'ユーザー') + ' 様';
+                }
             } catch (e) {
                 console.error('ユーザー情報の読み込みに失敗しました:', e);
             }
@@ -723,12 +997,439 @@
                 }
             });
         }
+
+        // フォームバリデーション
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        } else {
+                            // フォーム送信処理（API呼び出しなど）
+                            event.preventDefault()
+                            handleFormSubmit()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // フォーム送信処理
+        function handleFormSubmit() {
+            const formData = {
+                companyName: document.getElementById('companyName').value,
+                repName: document.getElementById('repName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                zipCode: document.getElementById('zipCode').value,
+                prefecture: document.getElementById('prefecture').value,
+                address: document.getElementById('address').value,
+                building: document.getElementById('building').value
+            }
+
+            // TODO: API呼び出しを実装
+            console.log('フォームデータ:', formData)
+            alert('登録処理を実行します（API実装が必要です）')
+        }
+
+        // 削除処理（モーダルから）
+        function handleDelete() {
+            const editId = document.getElementById('supplierForm').dataset.editId
+            if (!editId) return
+
+            // TODO: 削除API呼び出しを実装
+            suppliersData = suppliersData.filter(s => s.id !== parseInt(editId))
+            filteredSuppliers = filteredSuppliers.filter(s => s.id !== parseInt(editId))
+            
+            // モーダルを閉じる
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'))
+            if (modal) {
+                modal.hide()
+            }
+            
+            // 一覧に戻る
+            showList()
+            alert('削除しました（API実装が必要です）')
+        }
+
+        // モックデータ（実際の実装ではAPIから取得）
+        let suppliersData = [
+            {
+                id: 1,
+                companyName: '株式会社テックサプライ',
+                repName: '山田 太郎',
+                email: 'yamada@techsupply.co.jp',
+                phone: '03-1234-5678',
+                zipCode: '100-0001',
+                prefecture: '東京都',
+                address: '千代田区1-1-1',
+                building: 'テックビル 5F'
+            },
+            {
+                id: 2,
+                companyName: 'サンプル株式会社',
+                repName: '佐藤 花子',
+                email: 'sato@sample.co.jp',
+                phone: '06-9876-5432',
+                zipCode: '530-0001',
+                prefecture: '大阪府',
+                address: '大阪市北区1-2-3',
+                building: 'サンプルビル 10F'
+            },
+            {
+                id: 3,
+                companyName: '株式会社デモ商事',
+                repName: '鈴木 一郎',
+                email: 'suzuki@demo.co.jp',
+                phone: '052-1111-2222',
+                zipCode: '460-0001',
+                prefecture: '愛知県',
+                address: '名古屋市中区1-3-5',
+                building: 'デモビル 3F'
+            }
+        ]
+
+        let filteredSuppliers = [...suppliersData]
+
+        // 一覧を表示
+        function renderSupplierList() {
+            const tbody = document.getElementById('supplierTableBody')
+            tbody.innerHTML = ''
+
+            if (filteredSuppliers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                            仕入先が見つかりませんでした
+                        </td>
+                    </tr>
+                `
+                return
+            }
+
+            filteredSuppliers.forEach(supplier => {
+                const row = document.createElement('tr')
+                const fullAddress = `${supplier.prefecture || ''} ${supplier.address || ''} ${supplier.building || ''}`.trim()
+                
+                row.innerHTML = `
+                    <td>${supplier.companyName}</td>
+                    <td>${supplier.repName || '-'}</td>
+                    <td>${supplier.email}</td>
+                    <td>${supplier.phone || '-'}</td>
+                    <td>${fullAddress || '-'}</td>
+                    <td class="text-center align-middle">
+                        <div class="action-buttons d-flex justify-content-center align-items-center" style="height:100%;">
+                            <button class="btn btn-edit me-1" onclick="editSupplier(${supplier.id})" title="編集">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="btn btn-delete-list" onclick="deleteSupplier(${supplier.id})" title="削除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `
+                tbody.appendChild(row)
+            })
+        }
+
+        // 検索機能
+        function handleSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim()
+            
+            if (!searchTerm) {
+                filteredSuppliers = [...suppliersData]
+            } else {
+                filteredSuppliers = suppliersData.filter(supplier => {
+                    return (
+                        supplier.companyName.toLowerCase().includes(searchTerm) ||
+                        (supplier.repName && supplier.repName.toLowerCase().includes(searchTerm)) ||
+                        supplier.email.toLowerCase().includes(searchTerm) ||
+                        (supplier.phone && supplier.phone.includes(searchTerm))
+                    )
+                })
+            }
+            
+            renderSupplierList()
+        }
+
+        // Enterキーで検索
+        function handleSearchKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault()
+                handleSearch()
+            }
+        }
+
+        // 一覧を表示
+        function showList() {
+            document.querySelectorAll('.list-section').forEach(el => el.classList.remove('hidden'))
+            document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'))
+            // フォームをリセット
+            document.getElementById('supplierForm').reset()
+            document.getElementById('supplierForm').classList.remove('was-validated')
+            // 編集モードをリセット
+            document.getElementById('deleteButton').style.display = 'none'
+            document.getElementById('updateButton').style.display = 'none'
+            document.getElementById('registerButton').style.display = 'inline-block'
+            // データを再読み込み
+            loadSuppliers()
+        }
+
+        // 新規登録モーダルを表示
+        function showNewSupplierModal() {
+            // フォームをリセット
+            const form = document.getElementById('newSupplierForm')
+            form.reset()
+            form.classList.remove('was-validated')
+            
+            // モーダルを表示
+            const modal = new bootstrap.Modal(document.getElementById('newSupplierModal'))
+            modal.show()
+        }
+
+        // 新規登録フォーム送信処理
+        function handleNewSupplierSubmit() {
+            const form = document.getElementById('newSupplierForm')
+            
+            // バリデーションチェック
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated')
+                return
+            }
+
+            // フォームデータを取得
+            const formData = {
+                companyName: document.getElementById('modalCompanyName').value,
+                repName: document.getElementById('modalRepName').value,
+                email: document.getElementById('modalEmail').value,
+                phone: document.getElementById('modalPhone').value,
+                zipCode: document.getElementById('modalZipCode').value,
+                prefecture: document.getElementById('modalPrefecture').value,
+                address: document.getElementById('modalAddress').value,
+                building: document.getElementById('modalBuilding').value
+            }
+
+            // モックデータに追加
+            const newId = suppliersData.length > 0 ? Math.max(...suppliersData.map(s => s.id), 0) + 1 : 1
+            suppliersData.push({ id: newId, ...formData })
+            
+            // フィルタリングされたリストも更新
+            filteredSuppliers = [...suppliersData]
+            
+            // 一覧を再描画
+            renderSupplierList()
+            
+            // モーダルを閉じる
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newSupplierModal'))
+            if (modal) {
+                modal.hide()
+            }
+            
+            // 成功メッセージ
+            alert('仕入先を登録しました！\n\n登録内容:\n会社名: ' + formData.companyName + '\nメールアドレス: ' + formData.email + '\n\n※実際の実装では、メールアドレス宛に招待メールが送信されます。')
+        }
+
+        // 編集（モーダル表示）
+        function editSupplier(id) {
+            const supplier = suppliersData.find(s => s.id === id)
+            if (!supplier) {
+                alert('仕入先情報が見つかりませんでした。')
+                return
+            }
+
+            // フォームにデータを設定
+            document.getElementById('editModalCompanyName').value = supplier.companyName || ''
+            document.getElementById('editModalRepName').value = supplier.repName || ''
+            document.getElementById('editModalEmail').value = supplier.email || ''
+            document.getElementById('editModalPhone').value = supplier.phone || ''
+            document.getElementById('editModalZipCode').value = supplier.zipCode || ''
+            document.getElementById('editModalPrefecture').value = supplier.prefecture || ''
+            document.getElementById('editModalAddress').value = supplier.address || ''
+            document.getElementById('editModalBuilding').value = supplier.building || ''
+
+            // フォームをリセット
+            const form = document.getElementById('editSupplierForm')
+            form.classList.remove('was-validated')
+
+            // 編集IDを保存
+            form.dataset.editId = id
+
+            // モーダルを表示
+            const modal = new bootstrap.Modal(document.getElementById('editSupplierModal'))
+            modal.show()
+        }
+
+        // 編集モーダルでの更新処理
+        function handleEditSupplierSubmit() {
+            const form = document.getElementById('editSupplierForm')
+            
+            // バリデーションチェック
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated')
+                return
+            }
+
+            const editId = form.dataset.editId
+            if (!editId) {
+                alert('編集IDが見つかりませんでした。')
+                return
+            }
+
+            // フォームデータを取得
+            const formData = {
+                companyName: document.getElementById('editModalCompanyName').value,
+                repName: document.getElementById('editModalRepName').value,
+                email: document.getElementById('editModalEmail').value,
+                phone: document.getElementById('editModalPhone').value,
+                zipCode: document.getElementById('editModalZipCode').value,
+                prefecture: document.getElementById('editModalPrefecture').value,
+                address: document.getElementById('editModalAddress').value,
+                building: document.getElementById('editModalBuilding').value
+            }
+
+            // モックデータを更新
+            const index = suppliersData.findIndex(s => s.id === parseInt(editId))
+            if (index !== -1) {
+                suppliersData[index] = { ...suppliersData[index], ...formData }
+            }
+            
+            // フィルタリングされたリストも更新
+            const filteredIndex = filteredSuppliers.findIndex(s => s.id === parseInt(editId))
+            if (filteredIndex !== -1) {
+                filteredSuppliers[filteredIndex] = { ...filteredSuppliers[filteredIndex], ...formData }
+            }
+            
+            // 一覧を再描画
+            renderSupplierList()
+            
+            // モーダルを閉じる
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editSupplierModal'))
+            if (modal) {
+                modal.hide()
+            }
+            
+            // 成功メッセージ
+            alert('仕入先情報を更新しました！\n\n更新内容:\n会社名: ' + formData.companyName + '\nメールアドレス: ' + formData.email)
+        }
+
+        // 編集モーダルからの削除処理
+        function handleEditSupplierDelete() {
+            const form = document.getElementById('editSupplierForm')
+            const editId = form.dataset.editId
+            
+            if (!editId) {
+                alert('編集IDが見つかりませんでした。')
+                return
+            }
+
+            const supplier = suppliersData.find(s => s.id === parseInt(editId))
+            if (!supplier) {
+                alert('仕入先情報が見つかりませんでした。')
+                return
+            }
+
+            if (confirm(`「${supplier.companyName}」を削除してもよろしいですか？\n※この操作は取り消せません。`)) {
+                // モックデータから削除
+                suppliersData = suppliersData.filter(s => s.id !== parseInt(editId))
+                filteredSuppliers = filteredSuppliers.filter(s => s.id !== parseInt(editId))
+                
+                // 一覧を再描画
+                renderSupplierList()
+                
+                // モーダルを閉じる
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editSupplierModal'))
+                if (modal) {
+                    modal.hide()
+                }
+                
+                alert('削除しました（API実装が必要です）')
+            }
+        }
+
+        // 削除
+        function deleteSupplier(id) {
+            const supplier = suppliersData.find(s => s.id === id)
+            if (!supplier) return
+
+            if (confirm(`「${supplier.companyName}」を削除してもよろしいですか？\n※この操作は取り消せません。`)) {
+                // TODO: API呼び出しを実装
+                suppliersData = suppliersData.filter(s => s.id !== id)
+                filteredSuppliers = filteredSuppliers.filter(s => s.id !== id)
+                renderSupplierList()
+                alert('削除しました（API実装が必要です）')
+            }
+        }
+
+        // データを読み込む（実際の実装ではAPIから取得）
+        function loadSuppliers() {
+            // TODO: API呼び出しを実装
+            filteredSuppliers = [...suppliersData]
+            renderSupplierList()
+        }
+
+        // 編集モードか新規登録モードかを判定（URLパラメータなどから）
+        function checkEditMode() {
+            const urlParams = new URLSearchParams(window.location.search)
+            const editId = urlParams.get('id')
+            
+            if (editId) {
+                // 編集モード
+                editSupplier(parseInt(editId))
+            }
+        }
+
+        // フォーム送信処理
+        function handleFormSubmit() {
+            const formData = {
+                companyName: document.getElementById('companyName').value,
+                repName: document.getElementById('repName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                zipCode: document.getElementById('zipCode').value,
+                prefecture: document.getElementById('prefecture').value,
+                address: document.getElementById('address').value,
+                building: document.getElementById('building').value
+            }
+
+            const editId = document.getElementById('supplierForm').dataset.editId
+
+            if (editId) {
+                // 更新処理
+                // TODO: API呼び出しを実装
+                const index = suppliersData.findIndex(s => s.id === parseInt(editId))
+                if (index !== -1) {
+                    suppliersData[index] = { ...suppliersData[index], ...formData }
+                }
+                alert('更新しました（API実装が必要です）')
+            } else {
+                // 新規登録処理
+                // TODO: API呼び出しを実装
+                const newId = Math.max(...suppliersData.map(s => s.id), 0) + 1
+                suppliersData.push({ id: newId, ...formData })
+                alert('登録しました（API実装が必要です）')
+            }
+
+            // 一覧に戻る
+            showList()
+        }
         
         // ページ読み込み時に実行
         window.addEventListener('DOMContentLoaded', function() {
-            checkLoginStatus();
-            setActiveMenu();
-        });
+            checkLoginStatus()
+            setActiveMenu()
+            loadSuppliers()
+            
+            // 検索入力イベント
+            document.getElementById('searchInput').addEventListener('input', handleSearch)
+            
+            // URLパラメータから編集モードをチェック
+            checkEditMode()
+        })
     </script>
 </body>
 

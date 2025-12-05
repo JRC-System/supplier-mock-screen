@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JRC - アカウント設定</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 共通スタイルシート -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* AccountSettings.html固有のスタイル */
+        .settings-card {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        }
+        .nav-pills .nav-link {
+            color: #495057;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-pills .nav-link:hover {
+            background-color: #f0f4ff;
+            color: #667eea;
+        }
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .nav-pills .nav-link i {
+            width: 20px;
+        }
+        .password-toggle {
+            cursor: pointer;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-3" href="supplier_ui.html">
+                <div class="logo-placeholder">JRC</div>
+                <span class="navbar-brand-text d-none d-md-block">株式会社JRC</span>
+            </a>
+            
+            <!-- トップメニュー（ドロップダウン） -->
+            <div class="d-flex align-items-center ms-auto me-4">
+                <!-- ユーザー情報表示 -->
+                <div class="me-3 d-flex flex-column align-items-end">
+                    <small id="companyNameDisplay" class="text-light fw-bold"></small>
+                    <span id="userNameDisplay" class="text-light small"></span>
+                </div>
+                <!-- メニュードロップダウン -->
+                <div class="dropdown">
+                    <a class="dropdown-toggle" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-bars"></i>
+                        <span>メニュー</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="supplier_ui.html" id="navHome">
+                            <i class="fa-solid fa-house"></i>
+                            <span>ホーム</span>
+                        </a></li>
+                        <li><a class="dropdown-item" href="supplier-registration.html" id="navRegistration">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>仕入先登録</span>
+                        </a></li>
+                        <li><a class="dropdown-item" href="Notification_setting.html" id="navNotification">
+                            <i class="fa-solid fa-bell"></i>
+                            <span>通知先設定</span>
+                        </a></li>
+                        <li><a class="dropdown-item active" href="AccountSettings.html" id="navAccount">
+                            <i class="fa-solid fa-user-cog"></i>
+                            <span>アカウント設定</span>
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout(); return false;">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>ログアウト</span>
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+            <script>
+                // ログインユーザー情報（sessionStorageから取得して表示）
+                window.addEventListener('DOMContentLoaded', function() {
+                    let loggedInUser = null;
+                    try {
+                        loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+                    } catch(e){}
+                    if(loggedInUser){
+                        if(document.getElementById('companyNameDisplay'))
+                            document.getElementById('companyNameDisplay').textContent = loggedInUser.company_name || '';
+                        if(document.getElementById('userNameDisplay'))
+                            document.getElementById('userNameDisplay').textContent = (loggedInUser.user_name || '') + ' 様';
+                    }
+                });
+            </script>
+        </div>
+    </nav>
+
+<div class="container py-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="mb-4 text-center">アカウント設定</h2>
+
+            <div class="card settings-card">
+                <div class="card-header bg-white p-0">
+                    <!-- Navigation Tabs -->
+                    <ul class="nav nav-pills p-3" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab">
+                                <i class="fas fa-user-circle me-2"></i>基本情報変更
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-security-tab" data-bs-toggle="pill" data-bs-target="#pills-security" type="button" role="tab">
+                                <i class="fas fa-lock me-2"></i>パスワード変更
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="tab-content" id="pills-tabContent">
+                        
+                        <!-- TAB 1: Change Profile Info (Name, Email) -->
+                        <div class="tab-pane fade show active" id="pills-profile" role="tabpanel">
+                            <form id="profileForm" class="needs-validation" novalidate>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">企業名</label>
+                                    <input type="text" class="form-control bg-light" value="株式会社サンプル" readonly>
+                                    <div class="form-text">※企業名の変更は管理者への申請が必要です。</div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="repName" class="form-label fw-bold">代表者名</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="repName" value="山田 太郎" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="email" class="form-label fw-bold">メールアドレス</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" value="yamada@sample.com" required>
+                                    </div>
+                                    <div class="alert alert-warning mt-2 d-flex align-items-center" role="alert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <div>
+                                            メールアドレスを変更すると、確認メールが送信され、再度ログインが必要になる場合があります。
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <i class="fas fa-save me-2"></i>変更を保存
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- TAB 2: Change Password -->
+                        <div class="tab-pane fade" id="pills-security" role="tabpanel">
+                            <form id="passwordForm" class="needs-validation" novalidate>
+                                
+                                <!-- Current Password -->
+                                <div class="mb-4">
+                                    <label for="currentPassword" class="form-label fw-bold">現在のパスワード</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="currentPassword" required>
+                                        <span class="input-group-text password-toggle" onclick="togglePassword('currentPassword', this)">
+                                            <i class="far fa-eye"></i>
+                                        </span>
+                                        <div class="invalid-feedback">現在のパスワードを入力してください。</div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <!-- New Password -->
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label fw-bold">新しいパスワード</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="newPassword" minlength="8" required>
+                                        <span class="input-group-text password-toggle" onclick="togglePassword('newPassword', this)">
+                                            <i class="far fa-eye"></i>
+                                        </span>
+                                        <div class="invalid-feedback">パスワードは8文字以上で入力してください。</div>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="fas fa-check-circle text-success me-1"></i>8文字以上
+                                        <i class="fas fa-check-circle text-muted me-1"></i>英数字を含む
+                                    </div>
+                                </div>
+
+                                <!-- Confirm New Password -->
+                                <div class="mb-4">
+                                    <label for="confirmPassword" class="form-label fw-bold">新しいパスワード（確認）</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="confirmPassword" required>
+                                        <span class="input-group-text password-toggle" onclick="togglePassword('confirmPassword', this)">
+                                            <i class="far fa-eye"></i>
+                                        </span>
+                                        <div class="invalid-feedback">パスワードが一致しません。</div>
+                                    </div>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-success px-4">
+                                        <i class="fas fa-key me-2"></i>パスワードを変更
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JS for Validation and Password Toggle -->
+<script>
+    // ログイン状態をチェック
+    function checkLoginStatus() {
+        const loggedInUser = sessionStorage.getItem('loggedInUser');
+        
+        if (!loggedInUser) {
+            alert('ログインが必要です。');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            const user = JSON.parse(loggedInUser);
+            if (document.getElementById('companyNameDisplay')) {
+                document.getElementById('companyNameDisplay').textContent = user.company_name || '株式会社テスト';
+            }
+            if (document.getElementById('userNameDisplay')) {
+                document.getElementById('userNameDisplay').textContent = (user.user_name || 'ユーザー') + ' 様';
+            }
+        } catch (e) {
+            console.error('ユーザー情報の読み込みに失敗しました:', e);
+        }
+    }
+    
+    // ログアウト処理
+    function handleLogout() {
+        if (confirm('ログアウトしてもよろしいですか？')) {
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        }
+    }
+    
+    // アクティブなメニュー項目を設定
+    function setActiveMenu() {
+        const currentPage = window.location.pathname.split('/').pop() || 'AccountSettings.html';
+        const navLinks = document.querySelectorAll('.dropdown-item');
+        
+        navLinks.forEach(link => {
+            if (link.onclick) return; // ログアウトリンクは除外
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+            if (href && (currentPage === href || (currentPage === '' && href === 'AccountSettings.html'))) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // 1. Bootstrap Validation Logic
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                // Special check for password match
+                if (form.id === 'passwordForm') {
+                    const newPass = document.getElementById('newPassword');
+                    const confirmPass = document.getElementById('confirmPassword');
+                    if (newPass.value !== confirmPass.value) {
+                        confirmPass.setCustomValidity("パスワードが一致しません");
+                    } else {
+                        confirmPass.setCustomValidity("");
+                    }
+                }
+
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                } else {
+                    // フォーム送信処理（API呼び出しなど）
+                    event.preventDefault()
+                    handleFormSubmit(form.id)
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+
+    // フォーム送信処理
+    function handleFormSubmit(formId) {
+        if (formId === 'profileForm') {
+            const formData = {
+                repName: document.getElementById('repName').value,
+                email: document.getElementById('email').value
+            }
+            // TODO: API呼び出しを実装
+            console.log('プロフィール更新:', formData)
+            alert('プロフィール情報を更新しました（API実装が必要です）')
+        } else if (formId === 'passwordForm') {
+            const formData = {
+                currentPassword: document.getElementById('currentPassword').value,
+                newPassword: document.getElementById('newPassword').value
+            }
+            // TODO: API呼び出しを実装
+            console.log('パスワード変更:', formData)
+            alert('パスワードを変更しました（API実装が必要です）')
+            // フォームをリセット
+            document.getElementById('passwordForm').reset()
+            document.getElementById('passwordForm').classList.remove('was-validated')
+        }
+    }
+
+    // 2. Toggle Password Visibility (Eye Icon)
+    function togglePassword(inputId, iconSpan) {
+        const input = document.getElementById(inputId);
+        const icon = iconSpan.querySelector('i');
+        
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = "password";
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+    
+    // ページ読み込み時に実行
+    window.addEventListener('DOMContentLoaded', function() {
+        checkLoginStatus();
+        setActiveMenu();
+    });
+</script>
+
+</body>
+</html>
