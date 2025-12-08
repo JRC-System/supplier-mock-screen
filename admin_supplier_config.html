@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者設定 | Admin Config</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 共通スタイルシート -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <!-- 共通ヘッダー -->
+    <div id="common-header"></div>
+
+<div class="container py-5">
+    
+    <!-- ADMIN SIDE: Internal Notification Configuration -->
+    <div class="card border-danger shadow-sm" style="max-width: 600px; margin: 0 auto;">
+        <div class="card-header bg-danger text-white">
+            <i class="fas fa-user-shield me-2"></i>管理者用設定 (JRC内部通知)
+        </div>
+        <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted">
+                対象仕入先： 株式会社テックサプライ
+            </h6>
+            <p class="small text-muted mb-4">
+                仕入先のアクション発生時に、JRC購買担当者へ通知メールを送信するか設定します。
+                <br>不要な場合はスイッチをオフにしてください。
+            </p>
+
+            <form>
+                <!-- Switch 1: Quote/Order Response -->
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                    <div>
+                        <span class="fw-bold d-block">見積・発注回答時の通知</span>
+                        <span class="small text-muted">仕入先が回答を登録した際</span>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="notifyResponse" checked style="transform: scale(1.3);">
+                    </div>
+                </div>
+
+                <!-- Switch 2: Acceptance Processing -->
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                    <div>
+                        <span class="fw-bold d-block">受付処理時の通知</span>
+                        <span class="small text-muted">仕入先が受付処理を行った際</span>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="notifyAccept" checked style="transform: scale(1.3);">
+                    </div>
+                </div>
+
+                <!-- Switch 3: Info Change -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <span class="fw-bold d-block">登録情報・通知先変更時の通知</span>
+                        <span class="small text-muted">会社情報や担当者が変更された際</span>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="notifyChange" checked style="transform: scale(1.3);">
+                    </div>
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-save me-1"></i> 設定を保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- 共通ヘッダー -->
+<script src="common-header.js"></script>
+</body>
+</html>

@@ -289,80 +289,8 @@
 
 <body class="view-mode-single">
 
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center gap-3" href="supplier_ui.html">
-                <div class="logo-placeholder">JRC</div>
-                <span class="navbar-brand-text d-none d-md-block">株式会社JRC</span>
-            </a>
-            
-            <!-- トップメニュー（ドロップダウン） -->
-            <div class="d-flex align-items-center ms-auto me-4">
-                <!-- ユーザー情報表示 -->
-                <div class="me-3 d-flex flex-column align-items-end">
-                    <small id="companyNameDisplay" class="text-light fw-bold"></small>
-                    <span id="userNameDisplay" class="text-light small"></span>
-                </div>
-                <!-- メニュードロップダウン -->
-                <div class="dropdown">
-                    <a class="dropdown-toggle" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-bars"></i>
-                        <span>メニュー</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
-                        <li><a class="dropdown-item active" href="supplier_ui.html" id="navHome">
-                            <i class="fa-solid fa-house"></i>
-                            <span>ホーム</span>
-                        </a></li>
-                        <li><a class="dropdown-item" href="supplier-registration.html" id="navRegistration">
-                            <i class="fa-solid fa-user-plus"></i>
-                            <span>仕入先登録</span>
-                        </a></li>
-                        <li><a class="dropdown-item" href="Notification_setting.html" id="navNotification">
-                            <i class="fa-solid fa-bell"></i>
-                            <span>通知先設定</span>
-                        </a></li>
-                        <li><a class="dropdown-item" href="AccountSettings.html" id="navAccount">
-                            <i class="fa-solid fa-user-cog"></i>
-                            <span>アカウント設定</span>
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout(); return false;">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>ログアウト</span>
-                        </a></li>
-                    </ul>
-                </div>
-            </div>
-            <script>
-                // ログインユーザー情報（sessionStorageから取得して表示）
-                window.addEventListener('DOMContentLoaded', function() {
-                    let loggedInUser = null;
-                    try {
-                        loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-                    } catch(e){}
-                    if(loggedInUser){
-                        if(document.getElementById('companyNameDisplay'))
-                            document.getElementById('companyNameDisplay').textContent = loggedInUser.company_name || '';
-                        if(document.getElementById('userNameDisplay'))
-                            document.getElementById('userNameDisplay').textContent = (loggedInUser.user_name || '') + ' 様';
-                    }
-                });
-            </script>
-
-            <!-- <div class="navbar-user-info">
-                <small class="navbar-company-name" id="companyNameDisplay">株式会社テスト</small>
-                <div class="navbar-user-details">
-                    <span class="navbar-user-name" id="userNameDisplay">XXXXXXXX 様</span>
-                    <span class="badge navbar-status-badge">ログイン中</span>
-                    <button class="btn btn-outline-light navbar-logout-btn" onclick="handleLogout()">
-                        <i class="fa-solid fa-right-from-bracket me-1"></i>ログアウト
-                    </button>
-                </div>
-            </div> -->
-        </div>
-    </nav>
+    <!-- 共通ヘッダー -->
+    <div id="common-header"></div>
 
     <!-- Main Content -->
     <div class="container-fluid main-content py-4">
@@ -1212,61 +1140,15 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 共通ヘッダー -->
+    <script src="common-header.js"></script>
 
     <!-- Script to Handle Mode Toggle -->
     <script src="index.js"></script>
 
     <!-- ログイン状態管理スクリプト -->
     <script>
-        // ページ読み込み時にログイン状態をチェック
-        window.addEventListener('DOMContentLoaded', function () {
-            checkLoginStatus();
-            setActiveMenu(); // アクティブなメニュー項目を設定
-        });
-
-        // アクティブなメニュー項目を設定
-        function setActiveMenu() {
-            const currentPage = window.location.pathname.split('/').pop() || 'supplier_ui.html';
-            const navLinks = document.querySelectorAll('.dropdown-item');
-            
-            navLinks.forEach(link => {
-                if (link.onclick) return; // ログアウトリンクは除外
-                link.classList.remove('active');
-                const href = link.getAttribute('href');
-                if (href && (currentPage === href || (currentPage === '' && href === 'supplier_ui.html'))) {
-                    link.classList.add('active');
-                }
-            });
-        }
-
-        // ログイン状態をチェック
-        function checkLoginStatus() {
-            const loggedInUser = sessionStorage.getItem('loggedInUser');
-
-            if (!loggedInUser) {
-                // ログインしていない場合はlogin.htmlにリダイレクト
-                alert('ログインが必要です。');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // ログイン情報を表示
-            try {
-                const user = JSON.parse(loggedInUser);
-                document.getElementById('companyNameDisplay').textContent = user.company_name || '株式会社XXXXXXXX';
-                document.getElementById('userNameDisplay').textContent = (user.user_name || 'ユーザー') + ' 様';
-            } catch (e) {
-                console.error('ユーザー情報の読み込みに失敗しました:', e);
-            }
-        }
-
-        // ログアウト処理
-        function handleLogout() {
-            if (confirm('ログアウトしてもよろしいですか？')) {
-                sessionStorage.removeItem('loggedInUser');
-                window.location.href = 'login.html';
-            }
-        }
 
         // 表示モード切り替え機能
         function toggleViewMode() {
