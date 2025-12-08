@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知先設定 | User Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 共通スタイルシート -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <!-- 共通ヘッダー -->
+    <div id="common-header"></div>
+
+<div class="container py-5">
+    <!-- USER SIDE: Notification Recipient Registration -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="fas fa-users-cog me-2"></i>通知先メールアドレス管理</h5>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="fas fa-plus me-1"></i> 新規追加
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-secondary small mb-4">
+                <i class="fas fa-info-circle me-1"></i>
+                発注書、見積依頼、請求明細の通知を受け取る担当者を登録してください。<br>
+                ※1つのメールアドレスで複数の通知を受け取ることが可能です。
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="20%">担当者名</th>
+                            <th width="30%">メールアドレス</th>
+                            <th width="35%">受信設定 (役割)</th>
+                            <th width="15%" class="text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Row 1 -->
+                        <tr>
+                            <td>佐藤 一郎</td>
+                            <td>sato@supplier.com</td>
+                            <td>
+                                <span class="badge bg-success me-1"><i class="fas fa-file-invoice-dollar me-1"></i>発注</span>
+                                <span class="badge bg-info text-dark me-1"><i class="fas fa-calculator me-1"></i>見積</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-secondary me-1" title="編集"><i class="fas fa-pen"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" title="削除"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <!-- Row 2 -->
+                        <tr>
+                            <td>鈴木 経理</td>
+                            <td>suzuki.acc@supplier.com</td>
+                            <td>
+                                <span class="badge bg-warning text-dark"><i class="fas fa-file-invoice me-1"></i>請求明細</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fas fa-pen"></i></button>
+                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add New Recipient -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">通知先の新規登録</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">担当者名</label>
+                        <input type="text" class="form-control" placeholder="例：田中 次郎">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">メールアドレス <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label d-block">受信する通知の種類</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkOrder" checked>
+                            <label class="form-check-label" for="checkOrder">発注</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkQuote" checked>
+                            <label class="form-check-label" for="checkQuote">見積</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkBill">
+                            <label class="form-check-label" for="checkBill">請求明細</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                <button type="button" class="btn btn-primary">登録する</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- 共通ヘッダー -->
+<script src="common-header.js"></script>
+</body>
+</html>
