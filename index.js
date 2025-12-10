@@ -52,6 +52,7 @@ function toggleMode() {
     const contentModeHistory = document.getElementById('contentModeHistory');
     const displayFilterSection = document.getElementById('displayFilterSection');
     const sendButton = document.getElementById('sendButton');
+    const stickyFooter = document.querySelector('.sticky-footer');
 
     if (isInput) {
         // 回答するモード: demo.htmlスタイルを表示
@@ -67,6 +68,11 @@ function toggleMode() {
         // Show send button
         if (sendButton) {
             sendButton.style.display = 'inline-flex';
+        }
+
+        // Sticky Footerを表示
+        if (stickyFooter) {
+            stickyFooter.style.display = '';
         }
         
         document.body.style.backgroundColor = "#f4f6f9";
@@ -84,6 +90,11 @@ function toggleMode() {
         // Hide send button
         if (sendButton) {
             sendButton.style.display = 'none';
+        }
+
+        // Sticky Footerを非表示
+        if (stickyFooter) {
+            stickyFooter.style.display = 'none';
         }
         
         // Visual feedback for History Mode
