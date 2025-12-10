@@ -942,80 +942,115 @@
                     </div>
                 </div>
 
-                <!-- Details Row -->
-                <div class="row g-2">
-                    <!-- Left Column: Specs & Address -->
-                    <div class="col-lg-4 border-end">
-                        <div class="row mb-1">
-                            <div class="col-6">
-                                <div class="data-label">工場</div>
-                                <div class="data-value">本社工場</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="data-label">加工</div>
-                                <div class="badge bg-light text-dark border">メッキ</div>
-                            </div>
-                        </div>
-                        <div class="mb-1">
-                            <div class="data-label">納入先住所</div>
-                            <div class="text-address text-truncate">XXXXXXXXXX (Full address hidden)...</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="data-label">数量</div>
-                                <span class="fs-5 fw-bold text-primary">10</span> <span class="small"
-                                    style="font-size: 0.75rem;">本</span>
-                            </div>
-                            <div class="col-6">
-                                <div class="data-label">重量</div>
-                                <span class="fw-bold">500.000</span>
-                            </div>
-                        </div>
+                <!-- 1行モード表示 -->
+                <div class="col-12 card-detail-single">
+                    <div class="single-item">
+                        <label>依頼/発注No.:</label>
+                        <span class="value-display">0001241</span>
                     </div>
-
-                    <!-- Middle Column: Inputs -->
-                    <div class="col-lg-5 border-end">
-                        <div class="row g-1">
-                            <!-- Unit Price -->
-                            <div class="col-md-6">
-                                <label class="data-label text-primary">回答単価 (円)</label>
-                                <input type="text" class="form-control form-control-sm text-end fw-bold"
-                                    placeholder="123456" readonly>
-                            </div>
-                            <!-- Total Price (Readonly) -->
-                            <div class="col-md-6">
-                                <label class="data-label">金額 (円)</label>
-                                <input type="text" class="form-control form-control-sm text-end bg-readonly"
-                                    value="99,999,999" readonly>
-                            </div>
-                            <!-- Shipping -->
-                            <div class="col-md-6">
-                                <label class="data-label text-primary">回答運賃 (円)</label>
-                                <input type="text" class="form-control form-control-sm text-end" placeholder="123456" readonly>
-                            </div>
-                            <!-- Delivery Date -->
-                            <div class="col-md-6">
-                                <label class="data-label text-primary">回答納期</label>
-                                <select class="form-select form-select-sm" disabled>
-                                    <option>ご成約後7日以内</option>
-                                    <option>即納</option>
-                                    <option>要相談</option>
-                                </select>
-                            </div>
-                        </div>
+                    <div class="single-item">
+                        <label>依頼/発注日:</label>
+                        <span class="value-display">2013/04/01</span>
                     </div>
+                    <div class="single-item">
+                        <label>数量:</label>
+                        <span class="value-display">10 本</span>
+                    </div>
+                    <div class="single-item">
+                        <label>回答単価 (円):</label>
+                        <span class="value-display">123,456</span>
+                    </div>
+                    <div class="single-item">
+                        <label>回答運賃 (円):</label>
+                        <span class="value-display">123,456</span>
+                    </div>
+                    <div class="single-item">
+                        <label>回答納期:</label>
+                        <span class="value-display">ご成約後7日以内</span>
+                    </div>
+                    <div class="single-item">
+                        <label>回答期限:</label>
+                        <span class="value-display text-danger fw-bold">2013/04/19</span>
+                    </div>
+                </div>
 
-                    <!-- Right Column: Status & Remarks -->
-                    <div class="col-lg-3">
-                        <div class="mb-2">
-                            <label class="data-label">回答期限</label>
-                            <div class="d-flex align-items-center text-danger fw-bold" style="font-size: 0.875rem;">
-                                <i class="fa-regular fa-calendar-xmark me-2"></i> 2013/04/19
+                <!-- 全表示モード -->
+                <div class="card-detail-full">
+                    <!-- Details Row -->
+                    <div class="row g-2">
+                        <!-- Left Column: Specs & Address -->
+                        <div class="col-lg-4 border-end">
+                            <div class="row mb-1">
+                                <div class="col-6">
+                                    <div class="data-label">工場</div>
+                                    <div class="data-value">本社工場</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="data-label">加工</div>
+                                    <div class="badge bg-light text-dark border">メッキ</div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <div class="data-label">納入先住所</div>
+                                <div class="text-address text-truncate">XXXXXXXXXX (Full address hidden)...</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="data-label">数量</div>
+                                    <span class="fs-5 fw-bold text-primary">10</span> <span class="small"
+                                        style="font-size: 0.75rem;">本</span>
+                                </div>
+                                <div class="col-6">
+                                    <div class="data-label">重量</div>
+                                    <span class="fw-bold">500.000</span>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <label class="data-label">備考</label>
-                            <textarea class="form-control form-control-sm" rows="2" placeholder="早急に...読み取り専用" readonly></textarea>
+
+                        <!-- Middle Column: Inputs -->
+                        <div class="col-lg-5 border-end">
+                            <div class="row g-1">
+                                <!-- Unit Price -->
+                                <div class="col-md-6">
+                                    <label class="data-label text-primary">回答単価 (円)</label>
+                                    <input type="text" class="form-control form-control-sm text-end fw-bold"
+                                        placeholder="123456" readonly>
+                                </div>
+                                <!-- Total Price (Readonly) -->
+                                <div class="col-md-6">
+                                    <label class="data-label">金額 (円)</label>
+                                    <input type="text" class="form-control form-control-sm text-end bg-readonly"
+                                        value="99,999,999" readonly>
+                                </div>
+                                <!-- Shipping -->
+                                <div class="col-md-6">
+                                    <label class="data-label text-primary">回答運賃 (円)</label>
+                                    <input type="text" class="form-control form-control-sm text-end" placeholder="123456" readonly>
+                                </div>
+                                <!-- Delivery Date -->
+                                <div class="col-md-6">
+                                    <label class="data-label text-primary">回答納期</label>
+                                    <select class="form-select form-select-sm" disabled>
+                                        <option>ご成約後7日以内</option>
+                                        <option>即納</option>
+                                        <option>要相談</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Status & Remarks -->
+                        <div class="col-lg-3">
+                            <div class="mb-2">
+                                <label class="data-label">回答期限</label>
+                                <div class="d-flex align-items-center text-danger fw-bold" style="font-size: 0.875rem;">
+                                    <i class="fa-regular fa-calendar-xmark me-2"></i> 2013/04/19
+                                </div>
+                            </div>
+                            <div>
+                                <label class="data-label">備考</label>
+                                <textarea class="form-control form-control-sm" rows="2" placeholder="早急に...読み取り専用" readonly></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1048,75 +1083,110 @@
                     </div>
                 </div>
 
-                <!-- Details Row -->
-                <div class="row g-2">
-                    <!-- Left Column -->
-                    <div class="col-lg-4 border-end">
-                        <div class="row mb-2">
-                            <div class="col-6">
-                                <div class="data-label">工場</div>
-                                <div class="data-value">本社工場</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="data-label">加工</div>
-                                <div class="badge bg-light text-dark border">メッキ</div>
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="data-label">納入先住所</div>
-                            <div class="text-address text-truncate">XXXXXXXXXX (Full address hidden)...</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="data-label">数量</div>
-                                <span class="fs-4 fw-bold text-dark">10</span> <span class="small">本</span>
-                            </div>
-                            <div class="col-6">
-                                <div class="data-label">重量</div>
-                                <span class="fw-bold">500.000</span>
-                            </div>
-                        </div>
+                <!-- 1行モード表示 -->
+                <div class="col-12 card-detail-single">
+                    <div class="single-item">
+                        <label>依頼/発注No.:</label>
+                        <span class="value-display">0001241</span>
                     </div>
+                    <div class="single-item">
+                        <label>依頼/発注日:</label>
+                        <span class="value-display">2013/04/01</span>
+                    </div>
+                    <div class="single-item">
+                        <label>数量:</label>
+                        <span class="value-display">10 本</span>
+                    </div>
+                    <div class="single-item">
+                        <label>回答単価 (円):</label>
+                        <span class="value-display">9,999,999.99</span>
+                    </div>
+                    <div class="single-item">
+                        <label>回答運賃 (円):</label>
+                        <span class="value-display">-</span>
+                    </div>
+                    <div class="single-item">
+                        <label>回答納期:</label>
+                        <span class="value-display">2013/04/30</span>
+                    </div>
+                    <div class="single-item">
+                        <label>希望納期:</label>
+                        <span class="value-display">2013/04/19</span>
+                    </div>
+                </div>
 
-                    <!-- Middle Column -->
-                    <div class="col-lg-5 border-end">
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                <label class="data-label">回答単価 (円)</label>
-                                <input type="text" class="form-control text-end bg-readonly fw-bold"
-                                    value="9,999,999.99" readonly>
+                <!-- 全表示モード -->
+                <div class="card-detail-full">
+                    <!-- Details Row -->
+                    <div class="row g-2">
+                        <!-- Left Column -->
+                        <div class="col-lg-4 border-end">
+                            <div class="row mb-2">
+                                <div class="col-6">
+                                    <div class="data-label">工場</div>
+                                    <div class="data-value">本社工場</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="data-label">加工</div>
+                                    <div class="badge bg-light text-dark border">メッキ</div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="data-label">金額 (円)</label>
-                                <input type="text" class="form-control text-end bg-readonly" value="99,999,999"
-                                    readonly>
+                            <div class="mb-2">
+                                <div class="data-label">納入先住所</div>
+                                <div class="text-address text-truncate">XXXXXXXXXX (Full address hidden)...</div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="data-label text-primary">回答運賃 (円)</label>
-                                <input type="text" class="form-control text-end" placeholder="11111111111111" disabled>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="data-label text-primary">回答納期 (指定あり)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-warning text-dark border-warning"><i
-                                            class="fa-solid fa-calendar-day"></i></span>
-                                    <input type="date" class="form-control border-warning" value="2013-04-30" disabled>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="data-label">数量</div>
+                                    <span class="fs-4 fw-bold text-dark">10</span> <span class="small">本</span>
+                                </div>
+                                <div class="col-6">
+                                    <div class="data-label">重量</div>
+                                    <span class="fw-bold">500.000</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Right Column -->
-                    <div class="col-lg-3">
-                        <div class="mb-3">
-                            <label class="data-label">希望納期</label>
-                            <div class="d-flex align-items-center text-dark">
-                                2013/04/19
+                        <!-- Middle Column -->
+                        <div class="col-lg-5 border-end">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="data-label">回答単価 (円)</label>
+                                    <input type="text" class="form-control text-end bg-readonly fw-bold"
+                                        value="9,999,999.99" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="data-label">金額 (円)</label>
+                                    <input type="text" class="form-control text-end bg-readonly" value="99,999,999"
+                                        readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="data-label text-primary">回答運賃 (円)</label>
+                                    <input type="text" class="form-control text-end" placeholder="11111111111111" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="data-label text-primary">回答納期 (指定あり)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-warning text-dark border-warning"><i
+                                                class="fa-solid fa-calendar-day"></i></span>
+                                        <input type="date" class="form-control border-warning" value="2013-04-30" disabled>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <label class="data-label">備考</label>
-                            <textarea class="form-control" rows="2" placeholder="備考は読み取り専用です" readonly></textarea>
+
+                        <!-- Right Column -->
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                <label class="data-label">希望納期</label>
+                                <div class="d-flex align-items-center text-dark">
+                                    2013/04/19
+                                </div>
+                            </div>
+                            <div>
+                                <label class="data-label">備考</label>
+                                <textarea class="form-control" rows="2" placeholder="備考は読み取り専用です" readonly></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
