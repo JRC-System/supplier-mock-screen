@@ -77,7 +77,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label text-muted small">企業名</label>
-                                    <input type="text" class="form-control bg-light" value="株式会社サンプル" readonly>
+                                    <input type="text" class="form-control bg-light" value="株式会社サンプル" >
                                     <div class="form-text">※企業名の変更は管理者への申請が必要です。</div>
                                 </div>
 
@@ -93,7 +93,7 @@
                                     <label for="email" class="form-label fw-bold">メールアドレス</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                        <input type="email" class="form-control" id="email" value="yamada@sample.com" required>
+                                        <input type="email" class="form-control" id="email" value="yamada@sample.com" readonly>
                                     </div>
                                     <div class="alert alert-warning mt-2 d-flex align-items-center" role="alert">
                                         <i class="fas fa-exclamation-triangle me-2"></i>
@@ -157,7 +157,10 @@
                                     </div>
                                 </div>
 
-                                <div class="text-end">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="button" class="btn btn-primary" onclick="handleBackToLogin(); return false;" style="background-color: #f5f5f5; color: #333; border-color: #bdbdbd; font-weight: 600; letter-spacing: 0.08em;">
+                                        <i class="fas fa-sign-in-alt me-2" style="color: #999;"></i>ログイン画面に戻る
+                                    </button>
                                     <button type="submit" class="btn btn-success px-4">
                                         <i class="fas fa-key me-2"></i>パスワードを変更
                                     </button>
@@ -294,6 +297,12 @@
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
         }
+    }
+    
+    // ログイン画面へ戻る（セッションをクリア）
+    function handleBackToLogin() {
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href = 'login.html';
     }
     
     // ページ読み込み時に実行
