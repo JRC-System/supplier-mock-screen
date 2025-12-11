@@ -567,11 +567,11 @@
                     <table class="table table-hover mb-0">
                         <thead>
                             <tr>
+                                <th>事業所コード</th>
                                 <th>会社名</th>
                                 <th>代表者名</th>
                                 <th>メールアドレス</th>
                                 <th>電話番号</th>
-                                <th>所在地</th>
                                 <th class="text-center">操作</th>
                             </tr>
                         </thead>
@@ -723,6 +723,16 @@
                                 <label for="modalRepName" class="form-label">代表者名 / 担当者名</label>
                                 <input type="text" class="form-control" id="modalRepName" placeholder="例：山田 太郎">
                             </div>
+                            <div class="col-md-6">
+                                <label for="modalPassword" class="form-label required-label">パスワード</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="modalPassword" placeholder="8文字以上で入力" required>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleModalPassword()" aria-label="パスワード表示切替">
+                                        <i class="fa-solid fa-eye" id="modalPasswordEye"></i>
+                                    </button>
+                                </div>
+                        
+                            </div>
                         </div>
 
                         <!-- Section: Contact Info -->
@@ -771,6 +781,46 @@
                                 <input type="text" class="form-control" id="modalBuilding" placeholder="例：テックビル 5F">
                             </div>
                         </div>
+
+                        <!-- Section: Notification Settings -->
+                        <h5 class="mb-3 text-primary border-bottom pb-2">通知設定</h5>
+                        <p class="small text-muted mb-3">
+                            仕入先のアクション発生時に、JRC購買担当者へ通知メールを送信するか設定します。
+                        </p>
+                        <div class="mb-4">
+                            <!-- Switch 1: Quote/Order Response -->
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                                <div>
+                                    <span class="fw-bold d-block">見積・発注回答時の通知</span>
+                                    <span class="small text-muted">仕入先が回答を登録した際</span>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="modalNotifyResponse" checked style="transform: scale(1.3);">
+                                </div>
+                            </div>
+
+                            <!-- Switch 2: Acceptance Processing -->
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                                <div>
+                                    <span class="fw-bold d-block">受付処理時の通知</span>
+                                    <span class="small text-muted">仕入先が受付処理を行った際</span>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="modalNotifyAccept" checked style="transform: scale(1.3);">
+                                </div>
+                            </div>
+
+                            <!-- Switch 3: Info Change -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <span class="fw-bold d-block">登録情報・通知先変更時の通知</span>
+                                    <span class="small text-muted">会社情報や担当者が変更された際</span>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="modalNotifyChange" checked style="transform: scale(1.3);">
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -806,6 +856,15 @@
                             <div class="col-md-6">
                                 <label for="editModalRepName" class="form-label">代表者名 / 担当者名</label>
                                 <input type="text" class="form-control" id="editModalRepName" placeholder="例：山田 太郎">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editModalPassword" class="form-label required-label">パスワード</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="editModalPassword" value="test123456" required>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleEditModalPassword()" aria-label="パスワード表示切替">
+                                        <i class="fa-solid fa-eye" id="editModalPasswordEye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -853,6 +912,46 @@
                             <div class="col-12">
                                 <label for="editModalBuilding" class="form-label">建物名・階数</label>
                                 <input type="text" class="form-control" id="editModalBuilding" placeholder="例：テックビル 5F">
+                            </div>
+                        </div>
+
+                        <!-- Section: Notification Settings -->
+                        <h5 class="mb-3 text-primary border-bottom pb-2">通知設定</h5>
+                        <p class="small text-muted mb-3">
+                            仕入先のアクション発生時に、JRC購買担当者へ通知メールを送信するか設定します。
+                        </p>
+                        <div class="mb-4">
+                            <!-- Switch 1: Quote/Order Response -->
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                                <div>
+                                    <span class="fw-bold d-block">見積・発注回答時の通知</span>
+                                    <span class="small text-muted">仕入先が回答を登録した際</span>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="editModalNotifyResponse" checked style="transform: scale(1.3);">
+                                </div>
+                            </div>
+
+                            <!-- Switch 2: Acceptance Processing -->
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                                <div>
+                                    <span class="fw-bold d-block">受付処理時の通知</span>
+                                    <span class="small text-muted">仕入先が受付処理を行った際</span>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="editModalNotifyAccept" checked style="transform: scale(1.3);">
+                                </div>
+                            </div>
+
+                            <!-- Switch 3: Info Change -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <span class="fw-bold d-block">登録情報・通知先変更時の通知</span>
+                                    <span class="small text-muted">会社情報や担当者が変更された際</span>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="editModalNotifyChange" checked style="transform: scale(1.3);">
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -1004,6 +1103,7 @@
         let suppliersData = [
             {
                 id: 1,
+                supplierCode: '1001',
                 companyName: '株式会社テックサプライ',
                 repName: '山田 太郎',
                 email: 'yamada@techsupply.co.jp',
@@ -1011,10 +1111,14 @@
                 zipCode: '100-0001',
                 prefecture: '東京都',
                 address: '千代田区1-1-1',
-                building: 'テックビル 5F'
+                building: 'テックビル 5F',
+                notifyResponse: true,
+                notifyAccept: true,
+                notifyChange: true
             },
             {
                 id: 2,
+                supplierCode: '1002',
                 companyName: 'サンプル株式会社',
                 repName: '佐藤 花子',
                 email: 'sato@sample.co.jp',
@@ -1022,10 +1126,14 @@
                 zipCode: '530-0001',
                 prefecture: '大阪府',
                 address: '大阪市北区1-2-3',
-                building: 'サンプルビル 10F'
+                building: 'サンプルビル 10F',
+                notifyResponse: true,
+                notifyAccept: false,
+                notifyChange: true
             },
             {
                 id: 3,
+                supplierCode: '1003',
                 companyName: '株式会社デモ商事',
                 repName: '鈴木 一郎',
                 email: 'suzuki@demo.co.jp',
@@ -1033,7 +1141,10 @@
                 zipCode: '460-0001',
                 prefecture: '愛知県',
                 address: '名古屋市中区1-3-5',
-                building: 'デモビル 3F'
+                building: 'デモビル 3F',
+                notifyResponse: false,
+                notifyAccept: true,
+                notifyChange: false
             }
         ]
 
@@ -1061,11 +1172,11 @@
                 const fullAddress = `${supplier.prefecture || ''} ${supplier.address || ''} ${supplier.building || ''}`.trim()
                 
                 row.innerHTML = `
+                    <td>${supplier.supplierCode}</td>
                     <td>${supplier.companyName}</td>
                     <td>${supplier.repName || '-'}</td>
                     <td>${supplier.email}</td>
                     <td>${supplier.phone || '-'}</td>
-                    <td>${fullAddress || '-'}</td>
                     <td class="text-center align-middle">
                         <div class="action-buttons d-flex justify-content-center align-items-center" style="height:100%;">
                             <button class="btn btn-edit me-1" onclick="editSupplier(${supplier.id})" title="編集">
@@ -1131,6 +1242,11 @@
             form.reset()
             form.classList.remove('was-validated')
             
+            // 通知設定をデフォルト値（全てON）に設定
+            document.getElementById('modalNotifyResponse').checked = true
+            document.getElementById('modalNotifyAccept').checked = true
+            document.getElementById('modalNotifyChange').checked = true
+            
             // モーダルを表示
             const modal = new bootstrap.Modal(document.getElementById('newSupplierModal'))
             modal.show()
@@ -1150,12 +1266,17 @@
             const formData = {
                 companyName: document.getElementById('modalCompanyName').value,
                 repName: document.getElementById('modalRepName').value,
+                password: document.getElementById('modalPassword').value,
                 email: document.getElementById('modalEmail').value,
                 phone: document.getElementById('modalPhone').value,
                 zipCode: document.getElementById('modalZipCode').value,
                 prefecture: document.getElementById('modalPrefecture').value,
                 address: document.getElementById('modalAddress').value,
-                building: document.getElementById('modalBuilding').value
+                building: document.getElementById('modalBuilding').value,
+                // 通知設定
+                notifyResponse: document.getElementById('modalNotifyResponse').checked,
+                notifyAccept: document.getElementById('modalNotifyAccept').checked,
+                notifyChange: document.getElementById('modalNotifyChange').checked
             }
 
             // モックデータに追加
@@ -1195,6 +1316,16 @@
             document.getElementById('editModalPrefecture').value = supplier.prefecture || ''
             document.getElementById('editModalAddress').value = supplier.address || ''
             document.getElementById('editModalBuilding').value = supplier.building || ''
+            
+            // パスワードを設定（存在する場合）
+            if (supplier.password) {
+                document.getElementById('editModalPassword').value = supplier.password
+            }
+            
+            // 通知設定を設定（デフォルト値はtrue）
+            document.getElementById('editModalNotifyResponse').checked = supplier.notifyResponse !== undefined ? supplier.notifyResponse : true
+            document.getElementById('editModalNotifyAccept').checked = supplier.notifyAccept !== undefined ? supplier.notifyAccept : true
+            document.getElementById('editModalNotifyChange').checked = supplier.notifyChange !== undefined ? supplier.notifyChange : true
 
             // フォームをリセット
             const form = document.getElementById('editSupplierForm')
@@ -1228,12 +1359,17 @@
             const formData = {
                 companyName: document.getElementById('editModalCompanyName').value,
                 repName: document.getElementById('editModalRepName').value,
+                password: document.getElementById('editModalPassword').value,
                 email: document.getElementById('editModalEmail').value,
                 phone: document.getElementById('editModalPhone').value,
                 zipCode: document.getElementById('editModalZipCode').value,
                 prefecture: document.getElementById('editModalPrefecture').value,
                 address: document.getElementById('editModalAddress').value,
-                building: document.getElementById('editModalBuilding').value
+                building: document.getElementById('editModalBuilding').value,
+                // 通知設定
+                notifyResponse: document.getElementById('editModalNotifyResponse').checked,
+                notifyAccept: document.getElementById('editModalNotifyAccept').checked,
+                notifyChange: document.getElementById('editModalNotifyChange').checked
             }
 
             // モックデータを更新
@@ -1314,6 +1450,40 @@
             // TODO: API呼び出しを実装
             filteredSuppliers = [...suppliersData]
             renderSupplierList()
+        }
+
+        // パスワード表示切替（新規登録モーダル用）
+        function toggleModalPassword() {
+            const input = document.getElementById('modalPassword')
+            const eye = document.getElementById('modalPasswordEye')
+            if (!input || !eye) return
+
+            if (input.type === 'password') {
+                input.type = 'text'
+                eye.classList.remove('fa-eye')
+                eye.classList.add('fa-eye-slash')
+            } else {
+                input.type = 'password'
+                eye.classList.remove('fa-eye-slash')
+                eye.classList.add('fa-eye')
+            }
+        }
+
+        // パスワード表示切替（編集モーダル用）
+        function toggleEditModalPassword() {
+            const input = document.getElementById('editModalPassword')
+            const eye = document.getElementById('editModalPasswordEye')
+            if (!input || !eye) return
+
+            if (input.type === 'password') {
+                input.type = 'text'
+                eye.classList.remove('fa-eye')
+                eye.classList.add('fa-eye-slash')
+            } else {
+                input.type = 'password'
+                eye.classList.remove('fa-eye-slash')
+                eye.classList.add('fa-eye')
+            }
         }
 
         // 編集モードか新規登録モードかを判定（URLパラメータなどから）

@@ -288,7 +288,8 @@
             password: 'admin123',
             company_name: '株式会社XXXXXXXX',
             user_name: '管理者',
-            supplier_code: 'SUP001'
+            supplier_code: 'SUP001',
+            role_cd : '1'
         },
         {
             company_cd: '1002',
@@ -296,7 +297,8 @@
             password: 'user123',
             company_name: 'サンプル株式会社',
             user_name: '山田太郎',
-            supplier_code: 'SUP002'
+            supplier_code: 'SUP002',
+            role_cd : '4'
         },
         {
             company_cd: '1001',
@@ -304,7 +306,8 @@
             password: 'tanaka123',
             company_name: '株式会社XXXXXXXX',
             user_name: '田中花子',
-            supplier_code: 'SUP001'
+            supplier_code: 'SUP001',
+            role_cd : '4'
         }
     ];
 
@@ -357,6 +360,7 @@
                 company_name: user.company_name,
                 user_name: user.user_name,
                 supplier_code: user.supplier_code,
+                role_cd : user.role_cd,
                 login_time: new Date().toISOString()
             }));
             
