@@ -47,10 +47,6 @@
                                     <i class="fa-solid fa-user-cog"></i>
                                     <span>アカウント設定</span>
                                 </a></li>
-                                <li><a class="dropdown-item" href="password_reset.html" id="navPasswordReset">
-                                    <i class="fa-solid fa-key"></i>
-                                    <span>パスワード再設定</span>
-                                </a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout(); return false;">
                                     <i class="fa-solid fa-right-from-bracket"></i>

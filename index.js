@@ -6,42 +6,42 @@
     
     let container = null;
     
-    if (isInput) {
-        // 回答するモード: contentModeInput内のカードをカウント
-        container = document.getElementById('contentModeInput');
-    } else if (isHistory) {
-        // 履歴確認モード: contentModeHistory内のカードをカウント
-        container = document.getElementById('contentModeHistory');
-    }
+    // if (isInput) {
+    //     // 回答するモード: contentModeInput内のカードをカウント
+    //     container = document.getElementById('contentModeInput');
+    // } else if (isHistory) {
+    //     // 履歴確認モード: contentModeHistory内のカードをカウント
+    //     container = document.getElementById('contentModeHistory');
+    // }
     
-    if (!container || container.style.display === 'none') {
-        displayCountElement.textContent = 0 ;
-        return;
-    }
+    // if (!container || container.style.display === 'none') {
+    //     displayCountElement.textContent = 0 ;
+    //     return;
+    // }
     
-    // フィルターに応じてカウント
-    const filterAll = document.getElementById('filterAll').checked;
-    const filterQuote = document.getElementById('filterQuote').checked;
-    const filterOrder = document.getElementById('filterOrder').checked;
+    // // フィルターに応じてカウント
+    // const filterAll = document.getElementById('filterAll').checked;
+    // const filterQuote = document.getElementById('filterQuote').checked;
+    // const filterOrder = document.getElementById('filterOrder').checked;
     
-    const allCards = container.querySelectorAll('.order-card');
-    let count = 0;
+    // const allCards = container.querySelectorAll('.order-card');
+    // let count = 0;
     
-    allCards.forEach(card => {
-        // カードが表示されているかチェック
-        const isVisible = card.offsetParent !== null;
-        if (isVisible) {
-            if (filterAll) {
-                count++;
-            } else if (filterQuote && card.classList.contains('type-quote')) {
-                count++;
-            } else if (filterOrder && card.classList.contains('type-order')) {
-                count++;
-            }
-        }
-    });
+    // allCards.forEach(card => {
+    //     // カードが表示されているかチェック
+    //     const isVisible = card.offsetParent !== null;
+    //     if (isVisible) {
+    //         if (filterAll) {
+    //             count++;
+    //         } else if (filterQuote && card.classList.contains('type-quote')) {
+    //             count++;
+    //         } else if (filterOrder && card.classList.contains('type-order')) {
+    //             count++;
+    //         }
+    //     }
+    // });
     
-    displayCountElement.textContent = count + "件";
+    // displayCountElement.textContent = count + "件";
 }
 
 function toggleMode() {
@@ -52,6 +52,8 @@ function toggleMode() {
     const contentModeHistory = document.getElementById('contentModeHistory');
     const displayFilterSection = document.getElementById('displayFilterSection');
     const sendButton = document.getElementById('sendButton');
+    const stickyFooter = document.querySelector('.sticky-footer');
+    const targetMonthSection = document.getElementById('targetMonthSection');
 
     if (isInput) {
         // 回答するモード: demo.htmlスタイルを表示
@@ -67,6 +69,16 @@ function toggleMode() {
         // Show send button
         if (sendButton) {
             sendButton.style.display = 'inline-flex';
+        }
+
+        // Sticky Footerを表示
+        if (stickyFooter) {
+            stickyFooter.style.display = '';
+        }
+
+        // 対象年月を非表示
+        if (targetMonthSection) {
+            targetMonthSection.style.display = 'none';
         }
         
         document.body.style.backgroundColor = "#f4f6f9";
@@ -85,6 +97,16 @@ function toggleMode() {
         if (sendButton) {
             sendButton.style.display = 'none';
         }
+
+        // Sticky Footerを非表示
+        if (stickyFooter) {
+            stickyFooter.style.display = 'none';
+        }
+
+        // 対象年月を表示
+        if (targetMonthSection) {
+            targetMonthSection.style.display = '';
+        }
         
         // Visual feedback for History Mode
         document.body.style.backgroundColor = "#eef2f7"; // Slightly darker background
@@ -98,6 +120,27 @@ function toggleMode() {
             applyDisplayFilter();
         }
     }, 100);
+}
+
+// 対象年月を前月/次月へシフト
+function shiftTargetMonth(delta) {
+    const monthInput = document.getElementById('targetMonthInput');
+    if (!monthInput || !monthInput.value) return;
+
+    const [year, month] = monthInput.value.split('-').map(Number);
+    if (!year || !month) return;
+
+    const date = new Date(year, month - 1 + delta, 1);
+    const newYear = date.getFullYear();
+    const newMonth = (date.getMonth() + 1).toString().padStart(2, '0');
+    monthInput.value = `${newYear}-${newMonth}`;
+
+    // モードが履歴の場合のみフィルタ再適用（表示件数更新含む）
+    if (document.getElementById('modeHistory')?.checked) {
+        if (typeof applyDisplayFilter === 'function') {
+            applyDisplayFilter();
+        }
+    }
 }
 
 // 送信機能（見積・発注回答）
@@ -225,4 +268,9 @@ function isNotificationEnabled(supplierCode, notificationType) {
 document.addEventListener('DOMContentLoaded', function() {
     toggleMode();
     updateDisplayCount();
+    // 前月/次月ボタン
+    const prevBtn = document.getElementById('prevMonthBtn');
+    const nextBtn = document.getElementById('nextMonthBtn');
+    if (prevBtn) prevBtn.addEventListener('click', function(e){ e.preventDefault(); shiftTargetMonth(-1); });
+    if (nextBtn) nextBtn.addEventListener('click', function(e){ e.preventDefault(); shiftTargetMonth(1); });
 });
