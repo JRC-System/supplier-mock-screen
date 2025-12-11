@@ -8,6 +8,36 @@
 
     // ヘッダーを生成する関数
     function createHeader() {
+        // ログインユーザー情報取得用
+        let loggedInUser = null;
+        try {
+            loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        } catch(e) {
+            // 無視
+        }
+
+        // 仕入先登録メニュー（管理者のみ表示）
+        let supplierRegistrationMenu = '';
+        if (loggedInUser && String(loggedInUser.role_cd) === '1') {
+            supplierRegistrationMenu = `
+                <li><a class="dropdown-item" href="supplier-registration.html" id="navRegistration">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>仕入先登録</span>
+                </a></li>
+            `;
+        }
+        
+        // 通知先設定メニュー（管理者の場合は非表示）
+        let notificationMenu = '';
+        if (!loggedInUser || loggedInUser.user_id !== 'admin') {
+            notificationMenu = `
+                <li><a class="dropdown-item" href="#" id="navNotification">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>通知先設定</span>
+                </a></li>
+            `;
+        }
+        
         const headerHTML = `
             <!-- Header -->
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
@@ -35,17 +65,15 @@
                                     <i class="fa-solid fa-house"></i>
                                     <span>ホーム</span>
                                 </a></li>
-                                <li><a class="dropdown-item" href="supplier-registration.html" id="navRegistration">
-                                    <i class="fa-solid fa-user-plus"></i>
-                                    <span>仕入先登録</span>
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" id="navNotification">
-                                    <i class="fa-solid fa-bell"></i>
-                                    <span>通知先設定</span>
-                                </a></li>
+                                ${supplierRegistrationMenu}
+                                ${notificationMenu}
                                 <li><a class="dropdown-item" href="AccountSettings.html" id="navAccount">
                                     <i class="fa-solid fa-user-cog"></i>
                                     <span>アカウント設定</span>
+                                </a></li>
+                                <li><a class="dropdown-item" href="password_reset.html" id="navPasswordReset">
+                                    <i class="fa-solid fa-key"></i>
+                                    <span>パスワード再設定</span>
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout(); return false;">
