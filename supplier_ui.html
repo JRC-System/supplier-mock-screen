@@ -321,18 +321,18 @@
                             </div>
 
                             <!-- Date Selection & History Nav -->
-                            <div>
+                            <div id="targetMonthSection">
                                 <label class="data-label d-block mb-1">対象年月</label>
                                 <div class="d-flex align-items-center gap-2">
                                     <!-- History Navigation Buttons (Hidden by default) -->
                                     <div class="history-controls btn-group">
-                                        <button class="btn btn-secondary btn-sm"><i
+                                        <button class="btn btn-secondary btn-sm" id="prevMonthBtn" onclick="shiftTargetMonth(-1); return false;"><i
                                                 class="fa-solid fa-chevron-left"></i> 前月</button>
-                                        <button class="btn btn-secondary btn-sm">次月 <i
+                                        <button class="btn btn-secondary btn-sm" id="nextMonthBtn" onclick="shiftTargetMonth(1); return false;">次月 <i
                                                 class="fa-solid fa-chevron-right"></i></button>
                                     </div>
 
-                                    <input type="month" class="form-control form-control-sm" value="2013-04"
+                                    <input type="month" class="form-control form-control-sm" id="targetMonthInput" value="2025-12"
                                         style="width: 150px;">
                                 </div>
                             </div>
@@ -891,9 +891,9 @@
                             <div class="col-md-3">
                                 <div class="mb-1">
                                     <label class="data-label text-primary">回答納期</label>
-                                    <div class="input-group input-group-sm">
-                                        <input type="date" class="form-control" value="2013-11-25">
-                                    </div>
+                                <div class="input-group input-group-sm">
+                                    <input type="date" class="form-control" value="2013-11-25">
+                                </div>
                                 </div>
                                 <div class="mb-1">
                                     <label class="data-label">回答期限</label>
